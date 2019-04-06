@@ -7,6 +7,8 @@ import java.util.Scanner;
 
 import Connection.*;
 import Users.Doctor;
+import Users.Manager;
+import Users.Operator;
 import Users.Patient;
 
 public class Login {
@@ -71,6 +73,13 @@ public class Login {
     	else if(role.equals("P")) {
     		Patient p = new Patient();
     		p.patientMenu(conn,person_id);
+    	}
+    	else if(role.equals("M")){
+    		Manager m = new Manager();
+    		m.managerMenu(conn,person_id);
+    	}else if(role.equals("O")) {
+    		Operator o = new Operator();
+    		o.operatorMenu(conn,person_id);
     	}
     }
 	}
