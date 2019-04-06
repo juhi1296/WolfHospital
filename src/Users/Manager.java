@@ -17,6 +17,11 @@ public class Manager {
 		System.out.println("8. Remove Staff");
 		System.out.println("9. Get Ward Usage");
 		System.out.println("10. View Patient Statistics");
+		System.out.println("11. Update Ward Information");
+		System.out.println("12. Delete Ward Information");
+		System.out.println("13. Doctor responsible all patients");
+		System.out.println("14. Logout");
+		System.out.println("Enter your choice :-> ");
 	}
 
 }

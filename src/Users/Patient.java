@@ -18,6 +18,8 @@ public class Patient {
 		System.out.println("2. View Test Results");
 		System.out.println("3. View Bills");
 		System.out.println("4. View Medical Records");		
+		System.out.println("5. Logout");
+		System.out.println("Enter your choice :-> ");
 	}
 	
 }
