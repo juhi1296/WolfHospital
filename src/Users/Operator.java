@@ -5,7 +5,7 @@ import java.sql.Connection;
 public class Operator {
 
 	
-	public void operatorMenu(Connection conn, String person_id) {
+	public void operatorMenu(Connection conn, int person_id) {
 		
 		// TODO Auto-generated method stub
 		

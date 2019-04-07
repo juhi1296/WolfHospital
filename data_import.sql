@@ -1,4 +1,3 @@
-create database WolfHospital;
 use WolfHospital;
 
 CREATE TABLE staff(SID INT PRIMARY KEY AUTO_INCREMENT,name VARCHAR(128) NOT NULL,age INT NOT NULL,gender VARCHAR(128),job_title VARCHAR(128) NOT NULL,professional_title VARCHAR(128),phone_number VARCHAR(128) NOT NULL,address VARCHAR(128) NOT NULL,department VARCHAR(128) NOT NULL);

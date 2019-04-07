@@ -11,7 +11,7 @@ public class Patient {
 
 	static Scanner sc = new Scanner(System.in);
 	
-	public void patientMenu(Connection conn, String person_id) throws InterruptedException, SQLException {
+	public void patientMenu(Connection conn, int person_id) throws InterruptedException, SQLException {
 		// TODO Auto-generated method stub
 		System.out.println("----------------------------Welcome Patient----------------------------");
 		System.out.println("1. View profile");

@@ -12,7 +12,7 @@ public class Manager {
 
 	static Scanner sc = new Scanner(System.in);
 	
-	public static void managerMenu(Connection conn, String person_id) {
+	public static void managerMenu(Connection conn, int person_id) {
 		// TODO Auto-generated method stub
 		try {
 			System.out.println("----------------------------Welcome Manager----------------------------");
@@ -61,7 +61,7 @@ public class Manager {
 		
 	}
 	
-	public static void viewPatients(Connection conn, String person_id) {
+	public static void viewPatients(Connection conn, int person_id) {
 		try {
 			PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,STATUS FROM PATIENT");
 			ResultSet rs = stmt.executeQuery();
@@ -96,7 +96,7 @@ public class Manager {
 		}
 	}
 	
-	public static void viewStaff(Connection conn, String person_id) {
+	public static void viewStaff(Connection conn, int person_id) {
 		try {
 			System.out.println("Enter Role :-> ");
 			String role = sc.next();
@@ -135,7 +135,7 @@ public class Manager {
 		}
 	}
 	
-	public static void addPatient(Connection conn, String person_id) throws ParseException, SQLException, InterruptedException {
+	public static void addPatient(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
 		try {
 			System.out.println("Enter Patient's ID :--> ");
 			int pid = sc.nextInt();
