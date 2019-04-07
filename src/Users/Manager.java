@@ -5,6 +5,7 @@ import java.util.Scanner;
 import java.sql.*;
 import java.sql.*;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class Manager {
@@ -40,6 +41,10 @@ public class Manager {
 			
 			case 2:
 				viewStaff(conn,person_id);
+				break;
+			
+			case 3:
+				addPatient(conn,person_id);
 				break;
 				
 			default:
@@ -129,6 +134,52 @@ public class Manager {
 			System.out.println(e);
 		}
 	}
+	
+	public static void addPatient(Connection conn, String person_id) throws ParseException, SQLException, InterruptedException {
+		try {
+			System.out.println("Enter Patient's ID :--> ");
+			int pid = sc.nextInt();
+			System.out.println("Enter Patient's Name :--> ");
+			String name = sc.next();
+			System.out.println("Enter Patient's SSN :--> ");
+			String ssn = sc.next();
+			System.out.println("Enter Patient's DOB :--> ");
+			String dob = sc.next();
+			System.out.println("Enter Patient's Phone Number :--> ");
+			String phone_number = sc.next();
+			System.out.println("Enter Patient's Address :--> ");
+			sc.nextLine();
+			String address = sc.nextLine();
+			System.out.println("Enter Patient's Age :--> ");
+			int age = sc.nextInt();
+			System.out.println("Enter Patient's Gender :--> ");
+			String gender = sc.next();
+			System.out.println("Enter Patient's Processing Treatment Plan :--> ");
+			int processing_treatment_plan = sc.nextInt();
+			System.out.println("Enter Patient's Status :--> ");
+			String status = sc.next();
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO patient (pid,name,ssn,dob,phone_number,address,age,gender,processing_treatment_plan,status) values(?,?,?,?,?,?,?,?,?,?)");
+			stmt.setInt(1, pid);
+			stmt.setString(2, name);
+			stmt.setString(3, ssn);
+			stmt.setString(4, dob);
+			stmt.setString(5, phone_number);
+			stmt.setString(6, address);
+			stmt.setInt(7, age);
+			stmt.setString(8, gender);
+			stmt.setInt(9, processing_treatment_plan);
+			stmt.setString(10, status);
+			stmt.executeUpdate();
+			
+			System.out.println("Patient added successfully");
+			managerMenu(conn, person_id);
+		}catch(Exception e) {
+			System.out.println(e);
+			managerMenu(conn, person_id);
+		}
+	}
+	
 	
 	public static void validChoice(int choice)
 	{
