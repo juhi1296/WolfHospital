@@ -31,13 +31,16 @@ public class Doctor {
 			viewProfile(conn,person_id);
 			break;
 		
-	/*	case 4:
-			updateMedRecord(conn,person_id);
-			break;	
 			
 		case 5:
 			viewPatient(conn,person_id);
 			break;
+			
+	/*	case 4:
+			updateMedRecord(conn,person_id);
+			break;	
+			
+		
 		
 		case 6:
 			viewTestResult(conn,person_id);
@@ -104,6 +107,96 @@ public class Doctor {
 			System.out.println(e);
 		}
 	  
+  }
+  
+  public static void viewPatient(Connection conn, int person_id)
+  {
+	  try {
+		  
+		  System.out.println("1. View all patients.");
+		  System.out.println("2. View a particular patient.");
+		  System.out.println("Enter your choice :-> ");
+
+		  int ch=sc.nextInt();
+		  
+		  if(ch==1)
+		  {
+			  PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,COMPLETING_TREATMENT FROM PATIENT");
+				ResultSet rs = stmt.executeQuery();
+				while(rs.next()) {
+					System.out.println("PID : " + rs.getInt("PID"));
+					System.out.println("NAME : " + rs.getString("NAME"));
+					System.out.println("SSN : " + rs.getString("SSN"));
+					System.out.println("DOB : " + rs.getDate("DOB"));
+					System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+					System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
+					System.out.println("AGE : " + rs.getInt("AGE"));
+					System.out.println("GENDER : " + rs.getString("GENDER"));
+					System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
+					System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+					System.out.println("\n");
+				}
+			
+				System.out.println("Press 0 to go back");
+				int choice = sc.nextInt();
+				if (choice == 0) {
+					doctorMenu(conn, person_id);
+				}
+				else
+				{
+					validChoice(0);
+					doctorMenu(conn, person_id);
+				}
+			  
+		  }
+		  else if(ch==2)
+		  {
+			  System.out.println("Enter the patient ID :-> ");
+			  int pid=sc.nextInt();
+			  
+			  PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,COMPLETING_TREATMENT FROM PATIENT WHERE PID=?");
+			
+			  stmt.setInt(1, pid);
+			  ResultSet rs = stmt.executeQuery();
+			  if(rs.next()) {
+					System.out.println("PID : " + rs.getInt("PID"));
+					System.out.println("NAME : " + rs.getString("NAME"));
+					System.out.println("SSN : " + rs.getString("SSN"));
+					System.out.println("DOB : " + rs.getDate("DOB"));
+					System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+					System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
+					System.out.println("AGE : " + rs.getInt("AGE"));
+					System.out.println("GENDER : " + rs.getString("GENDER"));
+					System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
+					System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+					System.out.println("\n");
+				}
+			
+				System.out.println("Press 0 to go back");
+				int choice = sc.nextInt();
+				if (choice == 0) {
+					doctorMenu(conn, person_id);
+				}
+				else
+				{
+					validChoice(0);
+					doctorMenu(conn, person_id);
+				}
+			  
+		  }
+		  else
+		  {
+			  System.out.println("Enter Valid choice");
+				viewPatient(conn,person_id);	
+		  }
+		  
+		  
+		 
+		  
+	  }
+	  catch(Exception e){
+		  System.out.println(e);
+	  }
   }
 	
   public static void validChoice(int choice)
