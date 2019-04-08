@@ -51,6 +51,10 @@ public class Manager {
 				addStaff(conn,person_id);
 				break;
 				
+			case 5:
+				editPatient(conn,person_id);
+				break;
+				
 			default:
 				System.out.println("Enter Valid choice");
 				managerMenu(conn,person_id);
@@ -263,6 +267,157 @@ public class Manager {
 		}catch(Exception e) {
 			System.out.println(e);
 			managerMenu(conn, person_id);
+		}
+	}
+	
+	public static void editPatient(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Edit Patient's profile--------------------");
+			System.out.println("Enter the patient ID :-> ");
+			int pid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,COMPLETING_TREATMENT FROM PATIENT WHERE PID=?");
+			stmt.setInt(1, pid);
+			ResultSet rs = stmt.executeQuery();
+			
+			if(rs.next()) {
+				System.out.println("PID : " + rs.getInt("PID"));
+				System.out.println("NAME : " + rs.getString("NAME"));
+				System.out.println("SSN : " + rs.getString("SSN"));
+				System.out.println("DOB : " + rs.getDate("DOB"));
+				System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+				System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
+				System.out.println("AGE : " + rs.getInt("AGE"));
+				System.out.println("GENDER : " + rs.getString("GENDER"));
+				System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
+				System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+				System.out.println("\n");
+			}
+			
+			System.out.println("Enter your selection to edit(Press 0 to go back): -->");
+			int choice = sc.nextInt();
+			
+			switch(choice) {
+				case 0: 
+					managerMenu(conn,person_id);
+					break;
+				
+				case 1: //Edit name
+					System.out.println("Enter new Name: --> ");
+					String name = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET NAME = ? WHERE PID=?");
+					stmt.setString(1, name);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's name edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 2: //Edit SSN
+					System.out.println("Enter new SSN: --> ");
+					String ssn = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET SSN = ? WHERE PID=?");
+					stmt.setString(1, ssn);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's SSN edited successfully");
+					managerMenu(conn, person_id);
+					break;	
+					
+				case 3: //Edit DOB
+					System.out.println("Enter new DOB: --> ");
+					String dob = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET DOB = ? WHERE PID=?");
+					stmt.setString(1, dob);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's DOB edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 4: //Edit Phone Number
+					System.out.println("Enter new Phone number: --> ");
+					String phone_number = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET PHONE_NUMBER = ? WHERE PID=?");
+					stmt.setString(1, phone_number);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's Phone Number edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 5: //Edit Address
+					System.out.println("Enter new Address: --> ");
+					sc.nextLine();
+					String address = sc.nextLine();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET ADDRESS = ? WHERE PID=?");
+					stmt.setString(1, address);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's Address edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 6: //Edit Age
+					System.out.println("Enter new age: --> ");
+					int age = sc.nextInt();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET AGE = ? WHERE PID=?");
+					stmt.setInt(1, age);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's name edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 7: //Edit Gender
+					System.out.println("Enter new Gender: --> ");
+					String gender = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET GENDER = ? WHERE PID=?");
+					stmt.setString(1, gender);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's gender edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 8: //Edit Processing Treatment Plan
+					System.out.println("Enter new processing treatment plan: --> ");
+					int processing_treatment_plan = sc.nextInt();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET PROCESSING_TREATMENT_PLAN = ? WHERE PID=?");
+					stmt.setInt(1, processing_treatment_plan);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's processing treatment plan edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 9: //Edit Completing Treatment
+					System.out.println("Enter new completing treatment status: --> ");
+					String completing_treatment = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE PATIENT SET COMPLETING_TREATMENT = ? WHERE PID=?");
+					stmt.setString(1, completing_treatment);
+					stmt.setInt(2, pid);
+					stmt.executeUpdate();
+					System.out.println("Patient's Completing treatment status edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				default:
+					break;
+			}
+			
+		}
+		catch(Exception ex) {
+			System.out.println(ex);
 		}
 	}
 	
