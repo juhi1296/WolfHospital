@@ -72,6 +72,10 @@ public class Manager {
 				wardUsage(conn,person_id);
 				break;
 				
+			case 10:
+				patientsPerMonth(conn,person_id);
+				break;
+				
 			case 14:
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
@@ -663,6 +667,37 @@ public class Manager {
 				managerMenu(conn, person_id);
 			}
 			
+			
+			
+		}catch(Exception ex) {
+			System.out.println("Exception" + ex);
+		}
+	}
+	
+	public static void patientsPerMonth(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Patients Per Month--------------------");
+			System.out.println("Enter Year and Month in the form YYYY-MM :-> ");
+			String start_date = sc.next();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) AS NUMBER_OF_PATIENTS FROM MEDICAL_RECORDS WHERE START_DATE LIKE ? ");
+			stmt.setString(1, start_date + "%");
+			
+			ResultSet rs = stmt.executeQuery();
+			if(rs.next()) {
+				System.out.println("Number of Patients : " + rs.getInt("NUMBER_OF_PATIENTS"));
+			}
+			
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
+			else
+			{
+				validChoice(0);
+				managerMenu(conn, person_id);
+			}
 			
 			
 		}catch(Exception ex) {
