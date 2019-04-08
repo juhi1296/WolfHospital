@@ -17,17 +17,17 @@ public class Manager {
 		// TODO Auto-generated method stub
 		try {
 			System.out.println("----------------------------Welcome Manager----------------------------");
-			System.out.println("1. View Patients");
+			System.out.println("1. View Patients"); 
 			System.out.println("2. View Staff");
 			System.out.println("3. Add Patient");
-			System.out.println("4. Add Staff");
-			System.out.println("5. Update Patient");
-			System.out.println("6. Update Staff");
+			System.out.println("4. Add Staff"); 
+			System.out.println("5. Update Patient"); 
+			System.out.println("6. Update Staff"); 
 			System.out.println("7. Remove Patient");
 			System.out.println("8. Remove Staff");
-			System.out.println("9. Get Ward Usage");
-			System.out.println("10. View Patient Statistics");
-			System.out.println("11. Update Ward Information");
+			System.out.println("9. Get Ward Usage"); //percentage
+			System.out.println("10. View Patient Statistics"); 
+			System.out.println("11. Update Ward Information"); // add ward, add bed,  update bed,delete bed
 			System.out.println("12. Delete Ward Information");
 			System.out.println("13. Doctor responsible all patients");
 			System.out.println("14. Logout");
@@ -58,6 +58,14 @@ public class Manager {
 				
 			case 6:
 				editStaff(conn,person_id);
+				break;
+				
+			case 7:
+				deletePatient(conn,person_id);
+				break;
+				
+			case 8:
+				deleteStaff(conn,person_id);
 				break;
 				
 			case 14:
@@ -160,7 +168,7 @@ public class Manager {
 	
 	public static void viewStaff(Connection conn, int person_id) {
 		try {
-			System.out.println("Enter Role :-> ");
+			System.out.println("Enter Role :-> "); // display option
 			String role = sc.next();
 			PreparedStatement stmt = conn.prepareStatement("SELECT SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF WHERE JOB_TITLE=?");
 			
@@ -568,6 +576,40 @@ public class Manager {
 		}
 		catch(Exception ex) {
 			System.out.println(ex);
+		}
+	}
+	
+	public static void deletePatient(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Delete Patient's profile--------------------");
+			System.out.println("Enter the patient ID :-> ");
+			int pid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM PATIENT WHERE PID=?");
+			stmt.setInt(1, pid);
+			stmt.executeUpdate();
+			System.out.println("Patient " + " "+pid+" " + "deleted succefully");
+			managerMenu(conn,person_id);
+			
+		}catch(Exception ex) {
+			System.out.println("No Entry corresponding to your choice can be found" + ex);
+		}
+	}
+	
+	public static void deleteStaff(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Delete Staff's profile--------------------");
+			System.out.println("Enter the staff ID :-> ");
+			int sid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM STAFF WHERE SID=?");
+			stmt.setInt(1, sid);
+			stmt.executeUpdate();
+			System.out.println("Staff " + " "+sid+" " + "deleted succefully");
+			managerMenu(conn,person_id);
+			
+		}catch(Exception ex) {
+			System.out.println("No Entry corresponding to your choice can be found" + ex);
 		}
 	}
 	
