@@ -55,6 +55,10 @@ public class Manager {
 				editPatient(conn,person_id);
 				break;
 				
+			case 6:
+				editStaff(conn,person_id);
+				break;
+				
 			default:
 				System.out.println("Enter Valid choice");
 				managerMenu(conn,person_id);
@@ -410,6 +414,145 @@ public class Manager {
 					System.out.println("Patient's Completing treatment status edited successfully");
 					managerMenu(conn, person_id);
 					break;
+					
+				default:
+					break;
+			}
+			
+		}
+		catch(Exception ex) {
+			System.out.println(ex);
+		}
+	}
+	
+	public static void editStaff(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Edit Staff's profile--------------------");
+			System.out.println("Enter the staff ID :-> ");
+			int sid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF WHERE SID=?");
+			stmt.setInt(1, sid);
+			ResultSet rs = stmt.executeQuery();
+			
+			if(rs.next()) {
+				System.out.println("SID : " + rs.getInt("SID"));
+				System.out.println("NAME : " + rs.getString("NAME"));
+				System.out.println("AGE : " + rs.getInt("AGE"));
+				System.out.println("GENDER : " + rs.getString("GENDER"));
+				System.out.println("JOB TITLE : " + rs.getString("JOB_TITLE"));
+				System.out.println("PROFESSIONAL TITLE : " + rs.getString("PROFESSIONAL_TITLE"));
+				System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+				System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
+				System.out.println("DEPARTMENT : " + rs.getString("DEPARTMENT"));
+				System.out.println("\n");
+			}
+			
+			System.out.println("Enter your selection to edit(Press 0 to go back): -->");
+			int choice = sc.nextInt();
+			
+			switch(choice) {
+				case 0: 
+					managerMenu(conn,person_id);
+					break;
+				
+				case 1: //Edit name
+					System.out.println("Enter new Name: --> ");
+					String name = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE STAFF SET NAME = ? WHERE SID=?");
+					stmt.setString(1, name);
+					stmt.setInt(2, sid);
+					stmt.executeUpdate();
+					System.out.println("Staff's name edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 2: //Edit Age
+					System.out.println("Enter new Age: --> ");
+					int age = sc.nextInt();
+					stmt = conn.prepareStatement(
+					"UPDATE STAFF SET AGE = ? WHERE SID=?");
+					stmt.setInt(1, age);
+					stmt.setInt(2, sid);
+					stmt.executeUpdate();
+					System.out.println("Staff's age edited successfully");
+					managerMenu(conn, person_id);
+					break;	
+					
+				case 3: //Edit Gender
+					System.out.println("Enter new Gender: --> ");
+					String gender = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE STAFF SET GENDER = ? WHERE SID=?");
+					stmt.setString(1, gender);
+					stmt.setInt(2, sid);
+					stmt.executeUpdate();
+					System.out.println("Staff's Gender edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 4: //Edit Job Title
+					System.out.println("Enter new Job Title: --> ");
+					String job_title = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE STAFF SET JOB_TITLE = ? WHERE SID=?");
+					stmt.setString(1, job_title);
+					stmt.setInt(2, sid);
+					stmt.executeUpdate();
+					System.out.println("Staff's Job Title edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 5: //Edit Professional Title
+					System.out.println("Enter new Professional Title: --> ");
+					String professional_title = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE STAFF SET PROFESSIONAL_TITLE = ? WHERE SID=?");
+					stmt.setString(1, professional_title);
+					stmt.setInt(2, sid);
+					stmt.executeUpdate();
+					System.out.println("Patient's Professional Title edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 6: //Edit Phone Number
+					System.out.println("Enter new phone number: --> ");
+					String phone_number = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE STAFF SET PHONE_NUMBER = ? WHERE SID=?");
+					stmt.setString(1, phone_number);
+					stmt.setInt(2, sid);
+					stmt.executeUpdate();
+					System.out.println("Staff's Phone Number edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 7: //Edit Address
+					System.out.println("Enter new Address: --> ");
+					sc.nextLine();
+					String address = sc.nextLine();
+					stmt = conn.prepareStatement(
+					"UPDATE STAFF SET ADDRESS = ? WHERE SID=?");
+					stmt.setString(1, address);
+					stmt.setInt(2, sid);
+					stmt.executeUpdate();
+					System.out.println("Staff's address edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 8: //Edit Department
+					System.out.println("Enter new Department: --> ");
+					String department = sc.next();
+					stmt = conn.prepareStatement(
+					"UPDATE STAFF SET DEPARTMENT = ? WHERE SID=?");
+					stmt.setString(1, department);
+					stmt.setInt(2, sid);
+					stmt.executeUpdate();
+					System.out.println("Staff's Department edited successfully");
+					managerMenu(conn, person_id);
+					break;
+				
 					
 				default:
 					break;
