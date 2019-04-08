@@ -2,6 +2,7 @@ package Users;
 
 import java.sql.Connection;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.sql.*;
 import java.sql.*;
 import java.text.DateFormat;
@@ -58,6 +59,20 @@ public class Manager {
 			case 6:
 				editStaff(conn,person_id);
 				break;
+				
+			case 7:
+				deletePatient(conn,person_id);
+				break;
+				
+			case 8:
+				deleteStaff(conn,person_id);
+				break;
+				
+			case 14:
+				System.out.println("Loggin out..");
+				TimeUnit.SECONDS.sleep(3);
+				System.exit(0);
+				break;	
 				
 			default:
 				System.out.println("Enter Valid choice");
@@ -561,6 +576,40 @@ public class Manager {
 		}
 		catch(Exception ex) {
 			System.out.println(ex);
+		}
+	}
+	
+	public static void deletePatient(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Delete Patient's profile--------------------");
+			System.out.println("Enter the patient ID :-> ");
+			int pid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM PATIENT WHERE PID=?");
+			stmt.setInt(1, pid);
+			stmt.executeUpdate();
+			System.out.println("Patient " + " "+pid+" " + "deleted succefully");
+			managerMenu(conn,person_id);
+			
+		}catch(Exception ex) {
+			System.out.println("No Entry corresponding to your choice can be found" + ex);
+		}
+	}
+	
+	public static void deleteStaff(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Delete Staff's profile--------------------");
+			System.out.println("Enter the staff ID :-> ");
+			int sid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM STAFF WHERE SID=?");
+			stmt.setInt(1, sid);
+			stmt.executeUpdate();
+			System.out.println("Staff " + " "+sid+" " + "deleted succefully");
+			managerMenu(conn,person_id);
+			
+		}catch(Exception ex) {
+			System.out.println("No Entry corresponding to your choice can be found" + ex);
 		}
 	}
 	
