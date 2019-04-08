@@ -2,6 +2,7 @@ package Users;
 
 import java.sql.Connection;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.sql.*;
 import java.sql.*;
 import java.text.DateFormat;
@@ -58,6 +59,12 @@ public class Manager {
 			case 6:
 				editStaff(conn,person_id);
 				break;
+				
+			case 14:
+				System.out.println("Loggin out..");
+				TimeUnit.SECONDS.sleep(3);
+				System.exit(0);
+				break;	
 				
 			default:
 				System.out.println("Enter Valid choice");
