@@ -25,7 +25,7 @@ public class Manager {
 			System.out.println("6. Update Staff"); 
 			System.out.println("7. Remove Patient");
 			System.out.println("8. Remove Staff");
-			System.out.println("9. Get Ward Usage"); //percentage
+			System.out.println("9. Get Ward Usage"); 
 			System.out.println("10. View Patient Statistics"); 
 			System.out.println("11. Update Ward Information"); // add ward, add bed,  update bed,delete bed
 			System.out.println("12. Delete Ward Information");
