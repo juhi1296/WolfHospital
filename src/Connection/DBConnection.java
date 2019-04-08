@@ -11,7 +11,7 @@ public class DBConnection {
 	// Update your user and password info here!
 
 	private static final String user = "root";
-	private static final String password = "root@mysql";
+	private static final String password = "rootjuhi123!";
 	
 	
 	public static Connection ConnectDB() throws ClassNotFoundException, SQLException {
