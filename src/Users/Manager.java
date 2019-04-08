@@ -16,17 +16,17 @@ public class Manager {
 		// TODO Auto-generated method stub
 		try {
 			System.out.println("----------------------------Welcome Manager----------------------------");
-			System.out.println("1. View Patients");
+			System.out.println("1. View Patients"); 
 			System.out.println("2. View Staff");
 			System.out.println("3. Add Patient");
-			System.out.println("4. Add Staff");
-			System.out.println("5. Update Patient");
-			System.out.println("6. Update Staff");
+			System.out.println("4. Add Staff"); 
+			System.out.println("5. Update Patient"); 
+			System.out.println("6. Update Staff"); 
 			System.out.println("7. Remove Patient");
 			System.out.println("8. Remove Staff");
-			System.out.println("9. Get Ward Usage");
-			System.out.println("10. View Patient Statistics");
-			System.out.println("11. Update Ward Information");
+			System.out.println("9. Get Ward Usage"); //percentage
+			System.out.println("10. View Patient Statistics"); 
+			System.out.println("11. Update Ward Information"); // add ward, add bed,  update bed,delete bed
 			System.out.println("12. Delete Ward Information");
 			System.out.println("13. Doctor responsible all patients");
 			System.out.println("14. Logout");
@@ -153,7 +153,7 @@ public class Manager {
 	
 	public static void viewStaff(Connection conn, int person_id) {
 		try {
-			System.out.println("Enter Role :-> ");
+			System.out.println("Enter Role :-> "); // display option
 			String role = sc.next();
 			PreparedStatement stmt = conn.prepareStatement("SELECT SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF WHERE JOB_TITLE=?");
 			
