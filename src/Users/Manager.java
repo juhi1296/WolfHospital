@@ -63,33 +63,76 @@ public class Manager {
 	
 	public static void viewPatients(Connection conn, int person_id) {
 		try {
-			PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,STATUS FROM PATIENT");
-			ResultSet rs = stmt.executeQuery();
-			while(rs.next()) {
-				System.out.println("PID : " + rs.getInt("PID"));
-				System.out.println("NAME : " + rs.getString("NAME"));
-				System.out.println("SSN : " + rs.getString("SSN"));
-				System.out.println("DOB : " + rs.getDate("DOB"));
-				System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
-				System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
-				System.out.println("AGE : " + rs.getInt("AGE"));
-				System.out.println("GENDER : " + rs.getString("GENDER"));
-				System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
-				System.out.println("STATUS : " + rs.getString("STATUS"));
-				System.out.println("\n");
+			
+			System.out.println("1. View all patients.");
+			System.out.println("2. View a particular patient.");
+			System.out.println("Enter your choice :-> ");
+
+			int ch=sc.nextInt();
+			
+			if(ch == 1) {
+				PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,STATUS FROM PATIENT");
+				ResultSet rs = stmt.executeQuery();
+				while(rs.next()) {
+					System.out.println("PID : " + rs.getInt("PID"));
+					System.out.println("NAME : " + rs.getString("NAME"));
+					System.out.println("SSN : " + rs.getString("SSN"));
+					System.out.println("DOB : " + rs.getDate("DOB"));
+					System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+					System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
+					System.out.println("AGE : " + rs.getInt("AGE"));
+					System.out.println("GENDER : " + rs.getString("GENDER"));
+					System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
+					System.out.println("STATUS : " + rs.getString("STATUS"));
+					System.out.println("\n");
+					
+				}
 				
+				System.out.println("Press 0 to go back");
+				int choice = sc.nextInt();
+				if (choice == 0) {
+					managerMenu(conn, person_id);
+				}
+				else
+				{
+					validChoice(0);
+					managerMenu(conn, person_id);
+				}
+			}
+			else if(ch == 2) {
+				System.out.println("Enter the patient ID :-> ");
+				  int pid=sc.nextInt();
+				  
+				  PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,COMPLETING_TREATMENT FROM PATIENT WHERE PID=?");
+				
+				  stmt.setInt(1, pid);
+				  ResultSet rs = stmt.executeQuery();
+				  if(rs.next()) {
+						System.out.println("PID : " + rs.getInt("PID"));
+						System.out.println("NAME : " + rs.getString("NAME"));
+						System.out.println("SSN : " + rs.getString("SSN"));
+						System.out.println("DOB : " + rs.getDate("DOB"));
+						System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+						System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
+						System.out.println("AGE : " + rs.getInt("AGE"));
+						System.out.println("GENDER : " + rs.getString("GENDER"));
+						System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
+						System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+						System.out.println("\n");
+					}
+				
+					System.out.println("Press 0 to go back");
+					int choice = sc.nextInt();
+					if (choice == 0) {
+						managerMenu(conn, person_id);
+					}
+					else
+					{
+						validChoice(0);
+						managerMenu(conn, person_id);
+					}
 			}
 			
-			System.out.println("Press 0 to go back");
-			int choice = sc.nextInt();
-			if (choice == 0) {
-				managerMenu(conn, person_id);
-			}
-			else
-			{
-				validChoice(0);
-				managerMenu(conn, person_id);
-			}
 			
 		}catch(Exception e) {
 			System.out.println(e);
@@ -137,8 +180,7 @@ public class Manager {
 	
 	public static void addPatient(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
 		try {
-			System.out.println("Enter Patient's ID :--> ");
-			int pid = sc.nextInt();
+			
 			System.out.println("Enter Patient's Name :--> ");
 			String name = sc.next();
 			System.out.println("Enter Patient's SSN :--> ");
@@ -159,8 +201,7 @@ public class Manager {
 			System.out.println("Enter Patient's Status :--> ");
 			String status = sc.next();
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO patient (pid,name,ssn,dob,phone_number,address,age,gender,processing_treatment_plan,status) values(?,?,?,?,?,?,?,?,?,?)");
-			stmt.setInt(1, pid);
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO patient (name,ssn,dob,phone_number,address,age,gender,processing_treatment_plan,status) values(?,?,?,?,?,?,?,?,?)");
 			stmt.setString(2, name);
 			stmt.setString(3, ssn);
 			stmt.setString(4, dob);
