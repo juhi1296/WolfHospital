@@ -68,6 +68,10 @@ public class Manager {
 				deleteStaff(conn,person_id);
 				break;
 				
+			case 9:
+				wardUsage(conn,person_id);
+				break;
+				
 			case 14:
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
@@ -168,8 +172,27 @@ public class Manager {
 	
 	public static void viewStaff(Connection conn, int person_id) {
 		try {
-			System.out.println("Enter Role :-> "); // display option
-			String role = sc.next();
+			
+			String role = "";
+			System.out.println("Select an option for Role :-> ");
+			System.out.println("1: Doctor, 2: Nurse, 3: Operator");
+			int roleId = sc.nextInt();
+			switch(roleId) {
+			case 1: 
+				 role = "Doctor";
+				 break;
+			case 2:
+				 role = "Nurse";
+				 break;
+			case 3:
+				 role = "Operator";
+				 break;
+			default:
+				break;
+			}
+			
+			
+			
 			PreparedStatement stmt = conn.prepareStatement("SELECT SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF WHERE JOB_TITLE=?");
 			
 			stmt.setString(1, role);
@@ -610,6 +633,40 @@ public class Manager {
 			
 		}catch(Exception ex) {
 			System.out.println("No Entry corresponding to your choice can be found" + ex);
+		}
+	}
+	
+	public static void wardUsage(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Ward Usage Percentage--------------------");
+			System.out.println("Enter the Ward ID :-> ");
+			int wid = sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT ? AS WID, COUNT(*) * 100/ (SELECT COUNT(*) FROM BED WHERE WID = ?) AS PERCENTAGE_UTILIZED FROM BED WHERE AVAILABILITY = 1 AND WID = ?");
+			stmt.setInt(1, wid);
+			stmt.setInt(2, wid);
+			stmt.setInt(3, wid);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				System.out.println("WID : " + rs.getInt("WID"));
+				System.out.println("PERCENTAGE UTILIZATION : " + rs.getDouble("PERCENTAGE_UTILIZED"));
+			}
+			
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
+			else
+			{
+				validChoice(0);
+				managerMenu(conn, person_id);
+			}
+			
+			
+			
+		}catch(Exception ex) {
+			System.out.println("Exception" + ex);
 		}
 	}
 	
