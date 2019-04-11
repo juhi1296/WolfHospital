@@ -105,6 +105,10 @@ public class Manager {
 				break;
 				
 			case 17:
+				responsibleDoctor(conn,person_id);
+				break;
+				
+			case 18:
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
 				System.exit(0);
@@ -918,6 +922,37 @@ public class Manager {
 			
 		}catch(Exception ex) {
 			System.out.println("No Entry corresponding to your choice can be found" + ex);
+		}
+	}
+	
+	public static void responsibleDoctor(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Patients for whom the Doctor is responsible--------------------");
+			System.out.println("Enter the Doctor ID :-> ");
+			int sid = sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("");
+			stmt.setInt(1, wid);
+			stmt.setInt(2, wid);
+			stmt.setInt(3, wid);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				System.out.println("WID : " + rs.getInt("WID"));
+				System.out.println("PERCENTAGE UTILIZATION : " + rs.getDouble("PERCENTAGE_UTILIZED"));
+			}
+			
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
+			else
+			{
+				validChoice(0);
+				managerMenu(conn, person_id);
+			}			
+		}catch(Exception ex) {
+			System.out.println("Exception" + ex);
 		}
 	}
 	
