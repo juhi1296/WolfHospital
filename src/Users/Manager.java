@@ -1,6 +1,5 @@
 package Users;
 
-import java.sql.Connection;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.sql.*;
@@ -267,6 +266,7 @@ public class Manager {
 	public static void addPatient(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
 		try {
 			
+			
 			System.out.println("Enter Patient's Name :--> ");
 			String name = sc.next();
 			System.out.println("Enter Patient's SSN :--> ");
@@ -299,8 +299,28 @@ public class Manager {
 			stmt.setString(9, completing_treatment);
 			stmt.executeUpdate();
 			
+			String get_max_PID = "SELECT MAX(PID) AS PID FROM PATIENT ;" ;
+			PreparedStatement stmt2 = conn.prepareStatement(get_max_PID);
+			ResultSet rs1 = stmt2.executeQuery();
+			  
+			rs1.next();
+			
+			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO registrations (sid,pid) values(?,?)");
+			stmt1.setInt(1, person_id);
+			stmt1.setInt(2, rs1.getInt("PID"));
+			stmt1.executeUpdate();
+			
 			System.out.println("Patient added successfully");
-			managerMenu(conn, person_id);
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
+			else
+			{
+				validChoice(0);
+				managerMenu(conn, person_id);
+			}			
 		}catch(Exception e) {
 			System.out.println(e);
 			managerMenu(conn, person_id);
