@@ -93,6 +93,18 @@ public class Manager {
 				break;
 				
 			case 14:
+				addBed(conn,person_id);
+				break;
+				
+			case 15: 
+				updateBed(conn,person_id);
+				break;
+				
+			case 16:
+				deleteBed(conn,person_id);
+				break;
+				
+			case 17:
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
 				System.exit(0);
@@ -712,6 +724,103 @@ public class Manager {
 			}
 		}catch(Exception ex) {
 			System.out.println("Exception" + ex);
+		}
+	}
+	
+	public static void addBed(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
+		try {
+			
+			System.out.println("Enter Ward ID :--> ");
+			int wid = sc.nextInt();
+			System.out.println("Enter availability status :--> ");
+			int availability = sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO bed (wid,availability) values(?,?)");
+			stmt.setInt(1, wid);
+			stmt.setInt(2, availability);
+			stmt.executeUpdate();
+			
+			System.out.println("Bed added successfully");
+			managerMenu(conn, person_id);
+		}catch(Exception e) {
+			System.out.println(e);
+			managerMenu(conn, person_id);
+		}
+	}
+	
+	public static void updateBed(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Edit Bed's Information--------------------");
+			System.out.println("Enter the Bed ID :-> ");
+			int bid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT WID,BID,AVAILABILITY FROM WARD WHERE BID=?");
+			stmt.setInt(1, bid);
+			ResultSet rs = stmt.executeQuery();
+			
+			if(rs.next()) {
+				System.out.println("WID : " + rs.getInt("WID"));
+				System.out.println("BID : " + rs.getInt("BID"));
+				System.out.println("AVAILABILITY : " + rs.getInt("AVAILABILITY"));
+				System.out.println("\n");
+			}
+			
+			System.out.println("Enter your selection to edit(Press 0 to go back): -->");
+			int choice = sc.nextInt();
+			
+			switch(choice) {
+				case 0: 
+					managerMenu(conn,person_id);
+					break;
+				
+				case 1: //Edit Ward 
+					System.out.println("Enter new Ward ID: --> ");
+					int wid = sc.nextInt();
+					stmt = conn.prepareStatement(
+					"UPDATE BED SET WID = ? WHERE BID=?");
+					stmt.setInt(1, wid);
+					stmt.setInt(2, bid);
+					stmt.executeUpdate();
+					System.out.println("Ward edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 2: //Edit Ward Availability
+					System.out.println("Change Availability: --> ");
+					int availability = sc.nextInt();
+					stmt = conn.prepareStatement(
+					"UPDATE BED SET AVAILABILITY = ? WHERE BID=?");
+					stmt.setInt(1, availability);
+					stmt.setInt(2, bid);
+					stmt.executeUpdate();
+					System.out.println("Bed availability edited successfully");
+					managerMenu(conn, person_id);
+					break;	
+				
+				default:
+					break;
+			}
+			
+		}
+		catch(Exception ex) {
+			System.out.println(ex);
+		}
+	}
+	
+	public static void deleteBed(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Delete Bed--------------------");
+			System.out.println("Enter the bed ID :-> ");
+			int bid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM BED WHERE BID=?");
+			stmt.setInt(1, bid);
+			stmt.executeUpdate();
+			System.out.println("Bed " + " "+bid+" " + "deleted succefully");
+			managerMenu(conn,person_id);
+			
+		}catch(Exception ex) {
+			System.out.println("No Entry corresponding to your choice can be found" + ex);
 		}
 	}
 	
