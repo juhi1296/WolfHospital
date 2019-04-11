@@ -931,14 +931,24 @@ public class Manager {
 			System.out.println("Enter the Doctor ID :-> ");
 			int sid = sc.nextInt();
 			
-			PreparedStatement stmt = conn.prepareStatement("");
-			stmt.setInt(1, wid);
-			stmt.setInt(2, wid);
-			stmt.setInt(3, wid);
+			PreparedStatement stmt = conn.prepareStatement("SELECT STAFF.NAME Doctor_Name, PATIENT.* FROM PATIENT,TREATS,DOCTOR,STAFF WHERE STAFF.SID = DOCTOR.SID AND DOCTOR.SID = TREATS.SID AND TREATS.PID = PATIENT.PID AND STAFF.SID = ?");
+			
+			stmt.setInt(1, sid);
+			
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
-				System.out.println("WID : " + rs.getInt("WID"));
-				System.out.println("PERCENTAGE UTILIZATION : " + rs.getDouble("PERCENTAGE_UTILIZED"));
+				System.out.println("Responsible Doctor : " + rs.getString("Doctor_Name"));
+				System.out.println("PID : " + rs.getInt("PID"));
+				System.out.println("Patient : " + rs.getString("NAME"));
+				System.out.println("SSN : " + rs.getString("SSN"));
+				System.out.println("DOB : " + rs.getString("DOB"));
+				System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+				System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
+				System.out.println("AGE : " + rs.getInt("AGE"));
+				System.out.println("GENDER : " + rs.getString("GENDER"));
+				System.out.println("PROCESSING TREATMENT PLAN : " + rs.getString("PROCESSING_TREATMENT_PLAN"));
+				System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+				System.out.println("\n");
 			}
 			
 			System.out.println("Press 0 to go back");
