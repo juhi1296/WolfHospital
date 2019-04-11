@@ -27,10 +27,14 @@ public class Manager {
 			System.out.println("8. Remove Staff");
 			System.out.println("9. Get Ward Usage"); 
 			System.out.println("10. View Patient Statistics"); 
-			System.out.println("11. Update Ward Information"); // add ward, add bed,  update bed,delete bed
-			System.out.println("12. Delete Ward Information");
-			System.out.println("13. Doctor responsible all patients");
-			System.out.println("14. Logout");
+			System.out.println("11. Add Ward Information");
+			System.out.println("12. Update Ward Information");
+			System.out.println("13. Delete Ward Information");
+			System.out.println("14. Add New Bed to ward");
+			System.out.println("15. Update Bed Information");
+			System.out.println("16. Delete Bed Information");
+			System.out.println("17. Doctor responsible for patients");
+			System.out.println("18. Logout");
 			System.out.println("Enter your choice :-> ");
 			
 			int manager_choice = sc.nextInt();
@@ -76,11 +80,24 @@ public class Manager {
 				patientsPerMonth(conn,person_id);
 				break;
 				
+			case 11:
+				addWard(conn,person_id);
+				break;
+				
+			case 12: 
+				updateWard(conn,person_id);
+				break;
+				
+			case 13:
+				deleteWard(conn,person_id);
+				break;
+				
 			case 14:
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
 				System.exit(0);
 				break;	
+					
 				
 			default:
 				System.out.println("Enter Valid choice");
@@ -195,8 +212,7 @@ public class Manager {
 				break;
 			}
 			
-			
-			
+
 			PreparedStatement stmt = conn.prepareStatement("SELECT SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF WHERE JOB_TITLE=?");
 			
 			stmt.setString(1, role);
@@ -595,7 +611,6 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;
 				
-					
 				default:
 					break;
 			}
@@ -665,10 +680,7 @@ public class Manager {
 			{
 				validChoice(0);
 				managerMenu(conn, person_id);
-			}
-			
-			
-			
+			}			
 		}catch(Exception ex) {
 			System.out.println("Exception" + ex);
 		}
@@ -698,10 +710,105 @@ public class Manager {
 				validChoice(0);
 				managerMenu(conn, person_id);
 			}
-			
-			
 		}catch(Exception ex) {
 			System.out.println("Exception" + ex);
+		}
+	}
+	
+	public static void addWard(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
+		try {
+			
+			System.out.println("Enter ID for Responsible Nurse :--> ");
+			int sid = sc.nextInt();
+			System.out.println("Enter charges for ward :--> ");
+			int charges = sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO ward (sid,charges) values(?,?)");
+			stmt.setInt(1, sid);
+			stmt.setInt(2, charges);
+			stmt.executeUpdate();
+			
+			System.out.println("Ward added successfully");
+			managerMenu(conn, person_id);
+		}catch(Exception e) {
+			System.out.println(e);
+			managerMenu(conn, person_id);
+		}
+	}
+	
+	public static void updateWard(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Edit Ward's Information--------------------");
+			System.out.println("Enter the Ward ID :-> ");
+			int wid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT WID,SID,CHARGES FROM WARD WHERE WID=?");
+			stmt.setInt(1, wid);
+			ResultSet rs = stmt.executeQuery();
+			
+			if(rs.next()) {
+				System.out.println("WID : " + rs.getInt("WID"));
+				System.out.println("SID : " + rs.getInt("SID"));
+				System.out.println("CHARGES : " + rs.getInt("CHARGES"));
+				System.out.println("\n");
+			}
+			
+			System.out.println("Enter your selection to edit(Press 0 to go back): -->");
+			int choice = sc.nextInt();
+			
+			switch(choice) {
+				case 0: 
+					managerMenu(conn,person_id);
+					break;
+				
+				case 1: //Edit Responsible Nurse
+					System.out.println("Enter new Nurse ID: --> ");
+					int sid = sc.nextInt();
+					stmt = conn.prepareStatement(
+					"UPDATE WARD SET SID = ? WHERE WID=?");
+					stmt.setInt(1, sid);
+					stmt.setInt(2, wid);
+					stmt.executeUpdate();
+					System.out.println("Responsible Nurse edited successfully");
+					managerMenu(conn, person_id);
+					break;
+					
+				case 2: //Edit Ward Charges
+					System.out.println("Enter new Ward Charges: --> ");
+					int charges = sc.nextInt();
+					stmt = conn.prepareStatement(
+					"UPDATE WARD SET CHARGES = ? WHERE WID=?");
+					stmt.setInt(1, charges);
+					stmt.setInt(2, wid);
+					stmt.executeUpdate();
+					System.out.println("Ward charges edited successfully");
+					managerMenu(conn, person_id);
+					break;	
+				
+				default:
+					break;
+			}
+			
+		}
+		catch(Exception ex) {
+			System.out.println(ex);
+		}
+	}
+	
+	public static void deleteWard(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Delete WARD--------------------");
+			System.out.println("Enter the ward ID :-> ");
+			int wid=sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM WARD WHERE WID=?");
+			stmt.setInt(1, wid);
+			stmt.executeUpdate();
+			System.out.println("Ward " + " "+wid+" " + "deleted succefully");
+			managerMenu(conn,person_id);
+			
+		}catch(Exception ex) {
+			System.out.println("No Entry corresponding to your choice can be found" + ex);
 		}
 	}
 	
