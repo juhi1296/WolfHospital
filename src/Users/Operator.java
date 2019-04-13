@@ -100,7 +100,8 @@ public class Operator {
 			stmt.execute();
 			
 			
-			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO medical_records(PID,start_date) values(pid,curdate());");
+			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO medical_records(PID,start_date) values(?,curdate());");
+			stmt1.setInt(1, pid);
 			stmt1.execute();
 			
 			System.out.println("Generating Billing Account ...");
@@ -116,7 +117,14 @@ public class Operator {
 			
 						
 			PreparedStatement stm2 = conn.prepareStatement("INSERT INTO billing_account(PID,payment_method,card_number,SSN_payer,billing_address,registration_fee,visit_date) \r\n" + 
-					"values (pid,?,?,?,?,100,curdate()");
+					"values (?,?,?,?,?,100,curdate())");
+			stm2.setInt(1, pid);
+			stm2.setString(2,payment_method );
+			stm2.setString(3, card_number);
+			stm2.setString(4, SSN_payer);
+			stm2.setString(5, billing_address);
+			stm2.execute();
+			System.out.println("CHECKED IN");
 			conn.commit();
 			
 		}
@@ -186,9 +194,6 @@ public class Operator {
 			
 			System.out.println("Enter Preference of Patient(1 bed, 2 beds and 4 beds) :-> ");
 			int pref = sc.nextInt();
-			System.out.println("Enter Today's Date :-> ");
-			String date = sc.next();
-			
 			
 			PreparedStatement stmt = conn.prepareStatement("select WID,Bed_ID from bed where WID IN (select WID from bed group by WID having count(WID) = ?) and availability = 0;");
 			stmt.setInt(1, pref);
@@ -202,12 +207,11 @@ public class Operator {
 				
 				int wid = rs.getInt("WID");
 				int bid = rs.getInt("Bed_ID");
-				PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO patient_is_assigned_bed values(?,?,?,?,?)");
+				PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO patient_is_assigned_bed values(?,?,?,curdate(),?)");
 				stmt1.setInt(1, pid);
 				stmt1.setInt(2, wid);
 				stmt1.setInt(3, bid);
-				stmt1.setString(4, date);
-				stmt1.setString(5, null);
+				stmt1.setString(4, null);
 				stmt1.execute();
 				
 				PreparedStatement stmt2 = conn.prepareStatement("UPDATE BED SET AVAILABILITY = 1 WHERE WID = ? AND Bed_ID = ?");
@@ -217,7 +221,7 @@ public class Operator {
 				
 				conn.commit();
 				
-				System.out.println("Patient is assigned a Bed" + bid + "in ward" + wid + "\n");
+				System.out.println("Patient is assigned a Bed "+ bid + "in ward " + wid + "\n");
 				
 			}	
 			
