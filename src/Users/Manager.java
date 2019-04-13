@@ -48,7 +48,18 @@ public class Manager {
 				break;
 			
 			case 3:
-				addPatient(conn,person_id);
+				int pid = addPatient(conn,person_id);
+				System.out.println("Patient with PID "+ pid + "added successfully");
+				System.out.println("Press 0 to go back");
+				int choice = sc.nextInt();
+				if (choice == 0) {
+					managerMenu(conn, person_id);
+				}
+				else
+				{
+					validChoice(0);
+					managerMenu(conn, person_id);
+				}		
 				break;
 				
 			case 4:
@@ -263,15 +274,16 @@ public class Manager {
 		}
 	}
 	
-	public static void addPatient(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
+	public static int addPatient(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
+		int pid1 = 0;
 		try {
 			
 			
 			System.out.println("Enter Patient's Name :--> ");
 			String name = sc.next();
-			System.out.println("Enter Patient's SSN :--> ");
+			System.out.println("Enter Patient's SSN (###-##-####):--> ");
 			String ssn = sc.next();
-			System.out.println("Enter Patient's DOB :--> ");
+			System.out.println("Enter Patient's DOB (YYYY-MM-DD) :--> ");
 			String dob = sc.next();
 			System.out.println("Enter Patient's Phone Number :--> ");
 			String phone_number = sc.next();
@@ -310,21 +322,13 @@ public class Manager {
 			stmt1.setInt(2, rs1.getInt("PID"));
 			stmt1.executeUpdate();
 			
-			System.out.println("Patient added successfully");
-			System.out.println("Press 0 to go back");
-			int choice = sc.nextInt();
-			if (choice == 0) {
-				managerMenu(conn, person_id);
-			}
-			else
-			{
-				validChoice(0);
-				managerMenu(conn, person_id);
-			}			
+			pid1 = rs1.getInt("PID");
+			
 		}catch(Exception e) {
 			System.out.println(e);
-			managerMenu(conn, person_id);
 		}
+		
+		return pid1 ;
 	}
 	
 	public static void addStaff(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
