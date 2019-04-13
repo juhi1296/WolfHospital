@@ -13,7 +13,7 @@ public class Operator {
 	public void operatorMenu(Connection conn, int person_id) {
 		
 		// TODO Auto-generated method stub
-		
+		int pid = 0;
 		try {
 		System.out.println("----------------------------Welcome Operator----------------------------");
 		System.out.println("1. Register New Patient");
@@ -26,26 +26,36 @@ public class Operator {
 		System.out.println("8. Maintain Billing account of Patient");
 		System.out.println("9. Generate Billing account for Patient");
 		System.out.println("10. Do not admit Patient");
+		
 		System.out.println("11. Logout");
+		System.out.println("12. Check In Patient");
 		System.out.println("Enter your choice :-> ");
 		
 		int doctor_choice = sc.nextInt();
 		
 		switch(doctor_choice) {
 		case 1: 
-			registerPatient(conn,person_id);
+			pid = registerPatient(conn,person_id);
 			break;
 			
 		case 2:
 			checkoutPatient(conn,person_id);
 			break;
 			
+		case 3:
+			generateBill(conn,person_id);
+			break;
+			
 		case 5:
-			assignBed(conn,person_id);
+			assignBed(conn,person_id,pid);
 			break;
 			
 		case 6:
 			releaseBed(conn,person_id);
+			break;
+			
+		case 12:
+			checkin(conn,person_id);
 			break;
 			
 		}
@@ -53,6 +63,76 @@ public class Operator {
 		}catch(Exception ex) {
 			System.out.println("Exception" + ex);
 		}
+	}
+	private void checkin(Connection conn, int person_id) {
+		int pid = 0;
+		try {
+			conn.setAutoCommit(false);
+			System.out.println("Do you want to register new Patient ?(Y/N) :");
+			String choice = sc.next();
+			
+			if(choice.equals("Y")) {
+				pid = registerPatient(conn,person_id);
+			}else {
+				System.out.println("Enter Your Name : ");
+				String name = sc.next();
+				System.out.println("Enter Your DOB (YYYY-MM-DD) : ");
+				String dob = sc.next();
+				PreparedStatement stmt = conn.prepareStatement("SELECT PID FROM PATIENT WHERE NAME = ? AND DOB = ?");
+				stmt.setString(1, name);
+				stmt.setString(2, dob);
+				ResultSet rs = stmt.executeQuery();
+				
+				rs.next();
+				pid = rs.getInt("PID");
+				
+			}
+			
+			System.out.println("Is Bed Required ?(Y/N)");
+			choice = sc.next();
+			if(choice.equals("Y")) {
+				assignBed(conn,person_id,pid);
+			}
+			
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO registrations values(?,?)");
+			stmt.setInt(1, person_id);
+			stmt.setInt(2, pid);
+			stmt.execute();
+			
+			
+			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO medical_records(PID,start_date) values(pid,curdate());");
+			stmt1.execute();
+			
+			System.out.println("Generating Billing Account ...");
+			System.out.println("Enter Payment Method :--> ");
+			String payment_method = sc.next();
+			System.out.println("Enter Card Number :--> ");
+			String card_number = sc.next();
+			System.out.println("Enter SSN for Payer :--> ");
+			String SSN_payer = sc.next();
+			System.out.println("Enter Billing Address :--> ");
+			String billing_address = sc.next();
+			
+			
+						
+			PreparedStatement stm2 = conn.prepareStatement("INSERT INTO billing_account(PID,payment_method,card_number,SSN_payer,billing_address,registration_fee,visit_date) \r\n" + 
+					"values (pid,?,?,?,?,100,curdate()");
+			conn.commit();
+			
+		}
+		catch(Exception ex) {
+			try {
+				conn.rollback();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
+	}
+	private void generateBill(Connection conn, int person_id) {
+		// TODO Auto-generated method stub
+		
 	}
 	private void releaseBed(Connection conn, int person_id) {
 		try {
@@ -97,10 +177,13 @@ public class Operator {
 		
 	}
 	
-	private void assignBed(Connection conn, int person_id) {
+	private void assignBed(Connection conn, int person_id, int pid) {
 		try {
-			System.out.println("Enter the patient ID :-> ");
-			int pid=sc.nextInt();
+			if(pid == 0) {
+				System.out.println("Enter the patient ID :-> ");
+				pid=sc.nextInt();
+			}
+			
 			System.out.println("Enter Preference of Patient(1 bed, 2 beds and 4 beds) :-> ");
 			int pref = sc.nextInt();
 			System.out.println("Enter Today's Date :-> ");
@@ -154,15 +237,18 @@ public class Operator {
 		
 		
 	}
-	private void registerPatient(Connection conn, int person_id) {
+	private int registerPatient(Connection conn, int person_id) {
 		// TODO Auto-generated method stub
+		int pid = 0;
 		Manager m = new Manager();
 		try {
-			m.addPatient(conn, person_id);
+			pid = m.addPatient(conn, person_id);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
+		return pid; 
 	}
 	
 	
