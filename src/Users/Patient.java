@@ -4,14 +4,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class Patient {
 
 	static Scanner sc = new Scanner(System.in);
 	
-	public void patientMenu(Connection conn, int pid) throws InterruptedException, SQLException {
+	public static void  patientMenu(Connection conn, int pid) throws InterruptedException, SQLException {
 		// TODO Auto-generated method stub
 		try {
 			System.out.println("----------------------------Welcome Patient----------------------------");
@@ -30,6 +34,19 @@ public class Patient {
 					viewProfile(conn,pid);
 					break;
 			
+				case 2: 
+					viewTestResult(conn,pid);
+					break;
+					
+				case 3:
+					viewBill(conn, pid);
+					break;
+				
+				case 5:
+					System.out.println("Logging out..");
+					TimeUnit.SECONDS.sleep(3);
+					System.exit(0);
+					break;	
 				
 				default:
 					System.out.println("Enter Valid choice");
@@ -43,7 +60,7 @@ public class Patient {
 		
 	}
 	
-	public void viewProfile(Connection conn, int pid)
+	public static void viewProfile(Connection conn, int pid)
 	{
 		try {
 		PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,COMPLETING_TREATMENT FROM PATIENT WHERE PID=?");
@@ -79,6 +96,251 @@ public class Patient {
 		{
 			System.out.println(e);
 		}
+	}
+	
+	public static void viewTestResult(Connection conn,int pid)
+	{
+		try {
+			System.out.println("------------Choose an option----------------");
+			System.out.println("1. View all your test results");
+			System.out.println("2. View Test performed on a particular Date");
+			System.out.println("3. View test result by Name of the test");
+			System.out.println("4. View test recommended by a doctor. ");
+			System.out.println("5. View test performed by a doctor.");
+			
+			int ch=sc.nextInt();
+			
+			
+			if(ch==1)
+			{
+				try {
+					PreparedStatement stmt = conn.prepareStatement("SELECT t.TID, t.recommended_SID,t.performed_SID, t.name, t.result,t.test_date FROM TEST t,MEDICAL_RECORDS m,RECORD_HAS_TEST r WHERE \n" + 
+							"r.RID=m.RID and r.TID=t.TID and m.PID=?");
+					stmt.setInt(1, pid);
+					ResultSet rs = stmt.executeQuery();
+					
+	
+					   while(rs.next()) {
+							System.out.println("TID : " + rs.getInt("TID"));
+							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
+							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
+							System.out.println("TEST NAME : " + rs.getString("NAME"));
+							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
+							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
+						}
+					   
+					
+						System.out.println("Press 0 to go back");
+						int choice = sc.nextInt();
+						if (choice == 0) {
+							patientMenu(conn, pid);
+						}
+						else
+						{
+							validChoice(0);
+							patientMenu(conn, pid);
+						}
+				}
+				catch(Exception e)
+				{
+					System.out.println(e);
+				}
+			}
+			
+			
+			else if(ch==2)
+			{
+				
+			    Date date = null;
+				try
+				{
+					
+					String expectedPattern = "yyyy-MM-dd";
+				    SimpleDateFormat formatter = new SimpleDateFormat(expectedPattern);
+			        formatter.setLenient(false);
+					System.out.println("Please enter a particular date in yyyy-mm-dd format.");
+					String d=sc.next();
+					date = formatter.parse(d);
+					
+
+				}
+				catch(ParseException e)
+				{
+					System.out.println("Please enter date in yyyy-mm-dd format.");
+					viewTestResult(conn, pid);
+				}
+				
+				
+				try {
+	
+					PreparedStatement stmt = conn.prepareStatement("SELECT t.TID, t.recommended_SID,t.performed_SID, t.name, t.result,t.test_date FROM TEST t,MEDICAL_RECORDS m,RECORD_HAS_TEST r WHERE r.RID=m.RID and r.TID=t.TID and m.PID=? and t.test_date=?");
+					stmt.setInt(1, pid);
+					stmt.setDate(2, new java.sql.Date(date.getTime()));
+					ResultSet rs = stmt.executeQuery();
+					
+					  while(rs.next()) {
+							System.out.println("TID : " + rs.getInt("TID"));
+							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
+							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
+							System.out.println("TEST NAME : " + rs.getString("NAME"));
+							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
+							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
+						}
+					 
+					
+						System.out.println("Press 0 to go back");
+						int choice = sc.nextInt();
+						if (choice == 0) {
+							patientMenu(conn, pid);
+						}
+						else
+						{
+							validChoice(0);
+							patientMenu(conn, pid);
+						}
+				}
+				catch(Exception e)
+				{
+					System.out.println(e);
+				}
+			}
+			else if(ch==3)
+			{
+				try {
+					System.out.println("Please enter name of the test");
+					String test=sc.next();
+					
+					PreparedStatement stmt = conn.prepareStatement("SELECT t.TID, t.recommended_SID,t.performed_SID, t.name, t.result,t.test_date FROM TEST t,MEDICAL_RECORDS m,RECORD_HAS_TEST r WHERE \n" + 
+							"r.RID=m.RID and r.TID=t.TID and m.PID=? and t.NAME like ?");
+					stmt.setInt(1, pid);
+					stmt.setString(2,'%'+test+'%');
+					ResultSet rs = stmt.executeQuery();
+					
+					 
+					  while(rs.next()) {
+							System.out.println("TID : " + rs.getInt("TID"));
+							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
+							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
+							System.out.println("TEST NAME : " + rs.getString("NAME"));
+							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
+							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
+						
+					  }
+					 
+						System.out.println("Press 0 to go back");
+						int choice = sc.nextInt();
+						if (choice == 0) {
+							patientMenu(conn, pid);
+						}
+						else
+						{
+							validChoice(0);
+							patientMenu(conn, pid);
+						}
+				}
+				catch(Exception e)
+				{
+					System.out.println(e);
+				}
+			}
+			else if(ch==4)
+			{
+				try {
+					System.out.println("Please enter ID of the recommending doctor");
+					int rec_doc=sc.nextInt();
+					
+					PreparedStatement stmt = conn.prepareStatement("SELECT t.TID, t.recommended_SID,t.performed_SID, t.name, t.result,t.test_date FROM TEST t,MEDICAL_RECORDS m,RECORD_HAS_TEST r WHERE \n" + 
+							"r.RID=m.RID and r.TID=t.TID and m.PID=? and t.RECOMMENDED_SID=?");
+					stmt.setInt(1, pid);
+					stmt.setInt(2,rec_doc);
+					ResultSet rs = stmt.executeQuery();
+					
+					 
+					  while(rs.next()) {
+							System.out.println("TID : " + rs.getInt("TID"));
+							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
+							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
+							System.out.println("TEST NAME : " + rs.getString("NAME"));
+							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
+							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
+						
+					  }
+					 
+						System.out.println("Press 0 to go back");
+						int choice = sc.nextInt();
+						if (choice == 0) {
+							patientMenu(conn, pid);
+						}
+						else
+						{
+							validChoice(0);
+							patientMenu(conn, pid);
+						}
+				}
+				catch(Exception e)
+				{
+					System.out.println(e);
+				}
+
+
+			}
+			else if(ch==5)
+			{
+				try {
+					System.out.println("Please enter ID of the doctor who performed the test");
+					int per_doc=sc.nextInt();
+					
+					PreparedStatement stmt = conn.prepareStatement("SELECT t.TID, t.recommended_SID,t.performed_SID, t.name, t.result,t.test_date FROM TEST t,MEDICAL_RECORDS m,RECORD_HAS_TEST r WHERE \n" + 
+							"r.RID=m.RID and r.TID=t.TID and m.PID=? and t.PERFORMED_SID=?");
+					stmt.setInt(1, pid);
+					stmt.setInt(2,per_doc);
+					ResultSet rs = stmt.executeQuery();
+					
+					 
+					  while(rs.next()) {
+							System.out.println("TID : " + rs.getInt("TID"));
+							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
+							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
+							System.out.println("TEST NAME : " + rs.getString("NAME"));
+							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
+							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
+						
+					  }
+					 
+						System.out.println("Press 0 to go back");
+						int choice = sc.nextInt();
+						if (choice == 0) {
+							patientMenu(conn, pid);
+						}
+						else
+						{
+							validChoice(0);
+							patientMenu(conn, pid);
+						}
+				}
+				catch(Exception e)
+				{
+					System.out.println(e);
+				}
+
+
+			}
+			else
+			{
+				System.out.println("Enter Valid choice");
+				patientMenu(conn,pid);
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+	
+	
+	public static void viewBill(Connection conn, int pid)
+	{
+		
 	}
 	
 	public static void validChoice(int choice)
