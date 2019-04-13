@@ -16,16 +16,16 @@ public class Operator {
 		int pid = 0;
 		try {
 		System.out.println("----------------------------Welcome Operator----------------------------");
-		System.out.println("1. Register New Patient");
-		System.out.println("2. Checkout Patient");
-		System.out.println("3. Generate Bills for Patient");
-		System.out.println("4. Check status of Wards");
-		System.out.println("5. Assign Bed in a Ward to patient");
-		System.out.println("6. Release Wards and Beds");
-		System.out.println("7. Update Medical Records for Patients");
-		System.out.println("8. Maintain Billing account of Patient");
-		System.out.println("9. Generate Billing account for Patient");
-		System.out.println("10. Do not admit Patient");
+		//System.out.println("1. Register New Patient");
+		//System.out.println("2. Checkout Patient");
+		//System.out.println("3. Generate Bills for Patient");
+		//System.out.println("4. Check status of Wards");
+		//System.out.println("5. Assign Bed in a Ward to patient");
+		//System.out.println("6. Release Wards and Beds");
+		//System.out.println("7. Update Medical Records for Patients");
+		//System.out.println("8. Maintain Billing account of Patient");
+		//System.out.println("9. Generate Billing account for Patient");
+		//System.out.println("10. Do not admit Patient");
 		System.out.println("11. Logout");
 		System.out.println("12. Check In Patient");
 		System.out.println("13. Check Out Patient");
@@ -74,7 +74,7 @@ public class Operator {
 			System.out.println("Enter End Date : ");
 			String end_d = sc.next();
 			
-			releaseBed(conn,person_id,pid);
+			releaseBed(conn,person_id,pid); // add arg end_date
 			
 			generateBill(conn,person_id,pid);
 			
