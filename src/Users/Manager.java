@@ -1,6 +1,5 @@
 package Users;
 
-import java.sql.Connection;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.sql.*;
@@ -105,6 +104,10 @@ public class Manager {
 				break;
 				
 			case 17:
+				responsibleDoctor(conn,person_id);
+				break;
+				
+			case 18:
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
 				System.exit(0);
@@ -263,6 +266,7 @@ public class Manager {
 	public static void addPatient(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
 		try {
 			
+			
 			System.out.println("Enter Patient's Name :--> ");
 			String name = sc.next();
 			System.out.println("Enter Patient's SSN :--> ");
@@ -295,8 +299,28 @@ public class Manager {
 			stmt.setString(9, completing_treatment);
 			stmt.executeUpdate();
 			
+			String get_max_PID = "SELECT MAX(PID) AS PID FROM PATIENT ;" ;
+			PreparedStatement stmt2 = conn.prepareStatement(get_max_PID);
+			ResultSet rs1 = stmt2.executeQuery();
+			  
+			rs1.next();
+			
+			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO registrations (sid,pid) values(?,?)");
+			stmt1.setInt(1, person_id);
+			stmt1.setInt(2, rs1.getInt("PID"));
+			stmt1.executeUpdate();
+			
 			System.out.println("Patient added successfully");
-			managerMenu(conn, person_id);
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
+			else
+			{
+				validChoice(0);
+				managerMenu(conn, person_id);
+			}			
 		}catch(Exception e) {
 			System.out.println(e);
 			managerMenu(conn, person_id);
@@ -918,6 +942,47 @@ public class Manager {
 			
 		}catch(Exception ex) {
 			System.out.println("No Entry corresponding to your choice can be found" + ex);
+		}
+	}
+	
+	public static void responsibleDoctor(Connection conn, int person_id) {
+		try {
+			System.out.println("----------------------Patients for whom the Doctor is responsible--------------------");
+			System.out.println("Enter the Doctor ID :-> ");
+			int sid = sc.nextInt();
+			
+			PreparedStatement stmt = conn.prepareStatement("SELECT STAFF.NAME Doctor_Name, PATIENT.* FROM PATIENT,TREATS,DOCTOR,STAFF WHERE STAFF.SID = DOCTOR.SID AND DOCTOR.SID = TREATS.SID AND TREATS.PID = PATIENT.PID AND STAFF.SID = ?");
+			
+			stmt.setInt(1, sid);
+			
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next()) {
+				System.out.println("Responsible Doctor : " + rs.getString("Doctor_Name"));
+				System.out.println("PID : " + rs.getInt("PID"));
+				System.out.println("Patient : " + rs.getString("NAME"));
+				System.out.println("SSN : " + rs.getString("SSN"));
+				System.out.println("DOB : " + rs.getString("DOB"));
+				System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+				System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
+				System.out.println("AGE : " + rs.getInt("AGE"));
+				System.out.println("GENDER : " + rs.getString("GENDER"));
+				System.out.println("PROCESSING TREATMENT PLAN : " + rs.getString("PROCESSING_TREATMENT_PLAN"));
+				System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+				System.out.println("\n");
+			}
+			
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
+			else
+			{
+				validChoice(0);
+				managerMenu(conn, person_id);
+			}			
+		}catch(Exception ex) {
+			System.out.println("Exception" + ex);
 		}
 	}
 	
