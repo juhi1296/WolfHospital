@@ -42,6 +42,9 @@ public class Patient {
 					viewBill(conn, pid);
 					break;
 				
+				case 4:
+					viewMedicalRecord(conn,pid);
+					break;
 				case 5:
 					System.out.println("Logging out..");
 					TimeUnit.SECONDS.sleep(3);
@@ -119,16 +122,24 @@ public class Patient {
 					stmt.setInt(1, pid);
 					ResultSet rs = stmt.executeQuery();
 					
-	
-					   while(rs.next()) {
+					if(!rs.next())
+					{
+						System.out.println("No test results available.");
+					}
+					else
+					{
+					   do {
+						    System.out.println("*******************************************");
 							System.out.println("TID : " + rs.getInt("TID"));
 							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
 							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
 							System.out.println("TEST NAME : " + rs.getString("NAME"));
 							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
 							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
+							System.out.println("*******************************************");
 						}
-					   
+					   while(rs.next());
+					}
 					
 						System.out.println("Press 0 to go back");
 						int choice = sc.nextInt();
@@ -178,15 +189,24 @@ public class Patient {
 					stmt.setDate(2, new java.sql.Date(date.getTime()));
 					ResultSet rs = stmt.executeQuery();
 					
-					  while(rs.next()) {
+					if(!rs.next())
+					{
+						System.out.println("No test results available.");
+					}
+					else
+					{
+					  do{
+						    System.out.println("*******************************************");
 							System.out.println("TID : " + rs.getInt("TID"));
 							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
 							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
 							System.out.println("TEST NAME : " + rs.getString("NAME"));
 							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
 							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
+							System.out.println("*******************************************");
 						}
-					 
+					  while(rs.next()) ;
+					}
 					
 						System.out.println("Press 0 to go back");
 						int choice = sc.nextInt();
@@ -216,17 +236,24 @@ public class Patient {
 					stmt.setString(2,'%'+test+'%');
 					ResultSet rs = stmt.executeQuery();
 					
-					 
-					  while(rs.next()) {
+					if(!rs.next())
+					{
+						System.out.println("No test results available.");
+					}
+					else
+					{ 
+					  do {
+						   System.out.println("*******************************************");
 							System.out.println("TID : " + rs.getInt("TID"));
 							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
 							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
 							System.out.println("TEST NAME : " + rs.getString("NAME"));
 							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
 							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
-						
+							System.out.println("*******************************************");
 					  }
-					 
+					  while(rs.next());
+					}
 						System.out.println("Press 0 to go back");
 						int choice = sc.nextInt();
 						if (choice == 0) {
@@ -255,17 +282,24 @@ public class Patient {
 					stmt.setInt(2,rec_doc);
 					ResultSet rs = stmt.executeQuery();
 					
-					 
-					  while(rs.next()) {
+					if(!rs.next())
+					{
+						System.out.println("No test results available.");
+					}
+					else
+					{  
+					  do {
+						    System.out.println("*******************************************");
 							System.out.println("TID : " + rs.getInt("TID"));
 							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
 							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
 							System.out.println("TEST NAME : " + rs.getString("NAME"));
 							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
 							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
+							System.out.println("*******************************************");
 						
-					  }
-					 
+					  }while(rs.next());
+					}
 						System.out.println("Press 0 to go back");
 						int choice = sc.nextInt();
 						if (choice == 0) {
@@ -296,17 +330,25 @@ public class Patient {
 					stmt.setInt(2,per_doc);
 					ResultSet rs = stmt.executeQuery();
 					
+
+					if(!rs.next())
+					{
+						System.out.println("No test results available.");
+					}
+					else
+					{  
 					 
-					  while(rs.next()) {
+					 do {
+						 System.out.println("*******************************************");
 							System.out.println("TID : " + rs.getInt("TID"));
 							System.out.println("TEST RECOMMENDED BY : " + rs.getString("RECOMMENDED_SID"));
 							System.out.println("TEST PERFORMED BY : " + rs.getString("PERFORMED_SID"));
 							System.out.println("TEST NAME : " + rs.getString("NAME"));
 							System.out.println("TEST RESULT : " + rs.getString("RESULT"));
 							System.out.println("TEST DATE : " + rs.getDate("TEST_DATE"));
-						
-					  }
-					 
+							System.out.println("*******************************************");
+					  } while(rs.next());
+					}
 						System.out.println("Press 0 to go back");
 						int choice = sc.nextInt();
 						if (choice == 0) {
@@ -340,7 +382,101 @@ public class Patient {
 	
 	public static void viewBill(Connection conn, int pid)
 	{
+		try
+		{
+			PreparedStatement stmt=conn.prepareStatement("Select B.BILL_ID, B.PID,P.NAME,B.CARD_NUMBER,B.SSN_PAYER,B.BILLING_ADDRESS, B.REGISTRATION_FEE,B.ACCOMODATION_FEE,B.MEDICATION_PRESCRIBED,B.VISIT_DATE FROM\n" + 
+					"BILLING_ACCOUNT B, PATIENT P WHERE B.PID=P.PID and B.PID=? and B.ACCOMODATION_FEE IS NOT NULL");
 		
+			stmt.setInt(1, pid);
+			ResultSet rs = stmt.executeQuery();
+			
+			if(!rs.next())
+			{
+				System.out.println("Bill is not yet ready");
+			}
+			else
+			{
+				do
+				{
+					System.out.println("*******************************************");
+					System.out.println("BILL ID : " + rs.getInt("BILL_ID"));
+					System.out.println("PATIENT ID : " + rs.getInt("PID"));
+					System.out.println("PATIENT NAME : " + rs.getString("NAME"));
+					System.out.println("CARD NUMBER : " + rs.getString("CARD_NUMBER"));
+					System.out.println("SS OF THE PAYER : " + rs.getString("SSN_PAYER"));
+					System.out.println("BILLING ADDRESS : " + rs.getString("BILLING_ADDRESS"));
+					System.out.println("REGISTRATION FEE : " + rs.getDouble("REGISTRATION_FEE"));
+					System.out.println("ACCOMODATION FEE : " + rs.getDouble("ACCOMODATION_FEE"));
+					System.out.println("MEDICATIION PRESCRIBED : " + rs.getString("MEDICATION_PRESCRIBED"));
+					System.out.println("VISIT DATE : " + rs.getDate("VISIT_DATE"));
+					System.out.println("*******************************************");
+				}
+				while(rs.next());
+			}
+			
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				patientMenu(conn, pid);
+			}
+			else
+			{
+				validChoice(0);
+				patientMenu(conn, pid);
+			}
+			
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+	
+	public static void viewMedicalRecord(Connection conn,int pid)
+	{
+		try {
+			PreparedStatement stmt=conn.prepareStatement("Select RID,START_DATE,END_DATE,PRESCRIPTION,DIAGNOSIS_DETAILS,RESPONSIBLE_DOCTOR FROM MEDICAL_RECORDS WHERE PID=?");
+		
+			stmt.setInt(1, pid);
+			
+			ResultSet rs=stmt.executeQuery();
+			
+			if(!rs.next())
+			{
+				System.out.println("No medical record exists");
+			}
+			else
+			{
+				do
+				{
+					System.out.println("*******************************************");
+					System.out.println("MEDICAL RECORD ID : " + rs.getInt("RID"));
+					System.out.println("START DATE : " + rs.getDate("START_DATE"));
+					System.out.println("END DATE : " + rs.getDate("END_DATE"));
+					System.out.println("PRESCRIPTION : " + rs.getString("PRESCRIPTION"));
+					System.out.println("DIAGNOSIS DETAILS : " + rs.getString("DIAGNOSIS_DETAILS"));
+					System.out.println("RESPONSIBLE DOCTOR : " + rs.getString("RESPONSIBLE_DOCTOR"));
+					System.out.println("*******************************************");
+				}
+				while(rs.next());
+			}
+			
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				patientMenu(conn, pid);
+			}
+			else
+			{
+				validChoice(0);
+				patientMenu(conn, pid);
+			}
+			
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
 	}
 	
 	public static void validChoice(int choice)
