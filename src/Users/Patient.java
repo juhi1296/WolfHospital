@@ -443,7 +443,7 @@ public class Patient {
 	{
 		try {
 			//To view medical records of the particular patient, records from medical_record table are extracted based on patient id PID
-			PreparedStatement stmt=conn.prepareStatement("Select RID,START_DATE,END_DATE,PRESCRIPTION,DIAGNOSIS_DETAILS,PROCESSING_TREATMENT_PLAN FROM MEDICAL_RECORDS WHERE PID=?");
+			PreparedStatement stmt=conn.prepareStatement("Select RID,START_DATE,END_DATE,PRESCRIPTION,DIAGNOSIS_DETAILS,PROCESSING_TREATMENT_PLAN,RESPONSIBLE_DOCTOR FROM MEDICAL_RECORDS WHERE PID=?");
 		
 			stmt.setInt(1, pid);
 			
@@ -464,6 +464,7 @@ public class Patient {
 					System.out.println("PRESCRIPTION : " + rs.getString("PRESCRIPTION"));
 					System.out.println("DIAGNOSIS DETAILS : " + rs.getString("DIAGNOSIS_DETAILS"));
 					System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
+					System.out.println("RESPONSIBLE DOCTOR ID : " + rs.getInt("RESPONSIBLE_DOCTOR"));
 					System.out.println("*******************************************");
 				}
 				while(rs.next());
