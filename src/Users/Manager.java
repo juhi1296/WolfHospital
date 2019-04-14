@@ -13,7 +13,6 @@ public class Manager {
 	static Scanner sc = new Scanner(System.in);
 	
 	public static void managerMenu(Connection conn, int person_id) {
-		// TODO Auto-generated method stub
 		try {
 			System.out.println("----------------------------Welcome Manager----------------------------");
 			System.out.println("1. View Patients"); 
@@ -144,12 +143,18 @@ public class Manager {
 			
 			System.out.println("1. View all patients.");
 			System.out.println("2. View a particular patient.");
+			System.out.println("Press 0 to go back");
 			System.out.println("Enter your choice :-> ");
+		
 
 			int ch=sc.nextInt();
 			
-			if(ch == 1) {
-				PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,COMPLETING_TREATMENT FROM PATIENT");
+			if (ch == 0) {
+				managerMenu(conn, person_id);
+			}
+			
+			else if(ch == 1) {
+				PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER FROM PATIENT");
 				ResultSet rs = stmt.executeQuery();
 				while(rs.next()) {
 					System.out.println("PID : " + rs.getInt("PID"));
@@ -160,19 +165,17 @@ public class Manager {
 					System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
 					System.out.println("AGE : " + rs.getInt("AGE"));
 					System.out.println("GENDER : " + rs.getString("GENDER"));
-					System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
-					System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+					
 					System.out.println("\n");
 					
 				}
 				
-				System.out.println("Press 0 to go back");
+				System.out.println("Press 0 to go back \n");
 				int choice = sc.nextInt();
-				if (choice == 0) {
-					managerMenu(conn, person_id);
-				}
-				else
-				{
+				
+				if(choice == 0) {
+					viewPatients(conn,person_id);
+				}else {
 					validChoice(0);
 					managerMenu(conn, person_id);
 				}
@@ -181,7 +184,7 @@ public class Manager {
 				System.out.println("Enter the patient ID :-> ");
 				  int pid=sc.nextInt();
 				  
-				  PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,COMPLETING_TREATMENT FROM PATIENT WHERE PID=?");
+				  PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER FROM PATIENT WHERE PID=?");
 				
 				  stmt.setInt(1, pid);
 				  ResultSet rs = stmt.executeQuery();
@@ -194,21 +197,26 @@ public class Manager {
 						System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
 						System.out.println("AGE : " + rs.getInt("AGE"));
 						System.out.println("GENDER : " + rs.getString("GENDER"));
-						System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
-						System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+						
 						System.out.println("\n");
+					}else {
+						System.out.println("Enter a Valid PID \n");
+						viewPatients(conn,person_id);	
 					}
 				
 					System.out.println("Press 0 to go back");
 					int choice = sc.nextInt();
 					if (choice == 0) {
-						managerMenu(conn, person_id);
+						viewPatients(conn, person_id);
 					}
 					else
 					{
 						validChoice(0);
 						managerMenu(conn, person_id);
 					}
+			}else {
+				System.out.println("Enter a Valid Choice \n");
+				viewPatients(conn,person_id);
 			}
 			
 			
@@ -219,29 +227,36 @@ public class Manager {
 	
 	public static void viewStaff(Connection conn, int person_id) {
 		try {
-			
 			String role = "";
 			System.out.println("Select an option for Role :-> ");
 			System.out.println("1: Doctor, 2: Nurse, 3: Operator");
-			int roleId = sc.nextInt();
-			switch(roleId) {
+			System.out.println("Press 0 to go back");
+			
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
+			
+			PreparedStatement stmt = null;
+			switch(choice) {
 			case 1: 
 				 role = "Doctor";
+				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,DOCTOR WHERE DOCTOR.SID = staff.SID");
 				 break;
 			case 2:
 				 role = "Nurse";
+				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,NURSE WHERE NURSE.SID = staff.SID");
 				 break;
 			case 3:
 				 role = "Operator";
+				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,OPERATOR WHERE OPERATOR.SID = staff.SID");
 				 break;
 			default:
+				System.out.println("Enter a Valid Choice ");
+				viewStaff(conn,person_id);
 				break;
 			}
 			
-
-			PreparedStatement stmt = conn.prepareStatement("SELECT SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF WHERE JOB_TITLE=?");
-			
-			stmt.setString(1, role);
 			
 			ResultSet rs = stmt.executeQuery();
 			while(rs.next()) {
@@ -259,9 +274,9 @@ public class Manager {
 			}
 			
 			System.out.println("Press 0 to go back");
-			int choice = sc.nextInt();
-			if (choice == 0) {
-				managerMenu(conn, person_id);
+			int ch = sc.nextInt();
+			if (ch == 0) {
+				viewStaff(conn, person_id);
 			}
 			else
 			{
