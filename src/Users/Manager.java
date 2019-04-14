@@ -17,114 +17,92 @@ public class Manager {
 			System.out.println("----------------------------Welcome Manager----------------------------");
 			System.out.println("1. View Patients"); 
 			System.out.println("2. View Staff");
-			System.out.println("3. Add Patient");
-			System.out.println("4. Add Staff"); 
-			System.out.println("5. Update Patient"); 
-			System.out.println("6. Update Staff"); 
-			System.out.println("7. Remove Patient");
-			System.out.println("8. Remove Staff");
-			System.out.println("9. Get Ward Usage"); 
-			System.out.println("10. View Patient Statistics"); 
-			System.out.println("11. Add Ward Information");
-			System.out.println("12. Update Ward Information");
-			System.out.println("13. Delete Ward Information");
-			System.out.println("14. Add New Bed to ward");
-			System.out.println("15. Update Bed Information");
-			System.out.println("16. Delete Bed Information");
-			System.out.println("17. Doctor responsible for patients");
-			System.out.println("18. Logout");
+			System.out.println("3. Add Staff"); 
+			System.out.println("4. Update Patient"); 
+			System.out.println("5. Update Staff"); 
+			System.out.println("6. Delete Patient");
+			System.out.println("7. Remove Staff");
+			System.out.println("8. Get Ward Usage"); 
+			System.out.println("9. View Patient Statistics"); 
+			System.out.println("10. Add Ward Information");
+			System.out.println("11. Update Ward Information");
+			System.out.println("12. Delete Ward Information");
+			System.out.println("13. Add New Bed to ward");
+			System.out.println("14. Delete Bed Information");
+			System.out.println("15. Doctor responsible for patients");
+			System.out.println("16. Logout");
 			System.out.println("Enter your choice :-> ");
 			
 			int manager_choice = sc.nextInt();
 			
 			switch(manager_choice) {
-			case 1: 
+			case 1: //View all patients or View a particular patient
 				viewPatients(conn,person_id);
 				break;
 			
-			case 2:
+			case 2: //View staff information based on their roles
 				viewStaff(conn,person_id);
 				break;
 			
-			case 3:
-				int pid = addPatient(conn,person_id);
-				System.out.println("Patient with PID "+ pid + "added successfully");
-				System.out.println("Press 0 to go back");
-				int choice = sc.nextInt();
-				if (choice == 0) {
-					managerMenu(conn, person_id);
-				}
-				else
-				{
-					validChoice(0);
-					managerMenu(conn, person_id);
-				}		
-				break;
-				
-			case 4:
+			case 3: //Add new staff 
 				addStaff(conn,person_id);
 				break;
 				
-			case 5:
+			case 4: //Update information of existing patient
 				editPatient(conn,person_id);
 				break;
 				
-			case 6:
+			case 5: //Update information of existing staff
 				editStaff(conn,person_id);
 				break;
-				
-			case 7:
+			
+			case 6: //Delete existing patient
 				deletePatient(conn,person_id);
-				break;
+				break;	
 				
-			case 8:
+			case 7: //Delete existing staff
 				deleteStaff(conn,person_id);
 				break;
 				
-			case 9:
+			case 8: //Get Ward Usage Percentage
 				wardUsage(conn,person_id);
 				break;
 				
-			case 10:
+			case 9: //Get number of Patients per month
 				patientsPerMonth(conn,person_id);
 				break;
 				
-			case 11:
+			case 10: //Add new Ward information
 				addWard(conn,person_id);
 				break;
 				
-			case 12: 
+			case 11: //Update information of existing ward
 				updateWard(conn,person_id);
 				break;
 				
-			case 13:
+			case 12: //Delete existing ward information
 				deleteWard(conn,person_id);
 				break;
 				
-			case 14:
+			case 13: //Add new Bed information
 				addBed(conn,person_id);
 				break;
 				
-			case 15: 
-				updateBed(conn,person_id);
-				break;
-				
-			case 16:
+			case 14: //Delete existing bed 
 				deleteBed(conn,person_id);
 				break;
 				
-			case 17:
+			case 15: //All patients treated by a particular doctor
 				responsibleDoctor(conn,person_id);
 				break;
 				
-			case 18:
+			case 16: //Logout
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
 				System.exit(0);
 				break;	
-					
-				
-			default:
+									
+			default: //Invalid option selected. Throw back to previous menu.
 				System.out.println("Enter Valid choice");
 				managerMenu(conn,person_id);
 				break;	
@@ -146,14 +124,13 @@ public class Manager {
 			System.out.println("Press 0 to go back");
 			System.out.println("Enter your choice :-> ");
 		
-
 			int ch=sc.nextInt();
 			
-			if (ch == 0) {
+			if (ch == 0) { //Return to Manager Menu
 				managerMenu(conn, person_id);
 			}
 			
-			else if(ch == 1) {
+			else if(ch == 1) { //View information on all patients
 				PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER FROM PATIENT");
 				ResultSet rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -180,7 +157,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 				}
 			}
-			else if(ch == 2) {
+			else if(ch == 2) { //View information of a particular patient
 				System.out.println("Enter the patient ID :-> ");
 				  int pid=sc.nextInt();
 				  
@@ -233,25 +210,28 @@ public class Manager {
 			System.out.println("Press 0 to go back");
 			
 			int choice = sc.nextInt();
-			if (choice == 0) {
+			if (choice == 0) { //Return back to Manager Menu
 				managerMenu(conn, person_id);
 			}
 			
 			PreparedStatement stmt = null;
 			switch(choice) {
-			case 1: 
+			case 1: //View Doctor Information
 				 role = "Doctor";
 				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,DOCTOR WHERE DOCTOR.SID = staff.SID");
 				 break;
-			case 2:
+				 
+			case 2: //View Nurse Information
 				 role = "Nurse";
 				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,NURSE WHERE NURSE.SID = staff.SID");
 				 break;
-			case 3:
+				 
+			case 3: //View Operator Information
 				 role = "Operator";
 				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,OPERATOR WHERE OPERATOR.SID = staff.SID");
 				 break;
-			default:
+				 
+			default: //For other input
 				System.out.println("Enter a Valid Choice ");
 				viewStaff(conn,person_id);
 				break;
@@ -293,7 +273,6 @@ public class Manager {
 		int pid1 = 0;
 		try {
 			
-			
 			System.out.println("Enter Patient's Name :--> ");
 			String name = sc.next();
 			System.out.println("Enter Patient's SSN (###-##-####):--> ");
@@ -309,12 +288,8 @@ public class Manager {
 			int age = sc.nextInt();
 			System.out.println("Enter Patient's Gender :--> ");
 			String gender = sc.next();
-			System.out.println("Enter Patient's Processing Treatment Plan :--> ");
-			int processing_treatment_plan = sc.nextInt();
-			System.out.println("Enter Patient's Completing Treatment :--> ");
-			String completing_treatment = sc.next();
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO patient (name,ssn,dob,phone_number,address,age,gender,processing_treatment_plan,completing_treatment) values(?,?,?,?,?,?,?,?,?)");
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO patient (name,ssn,dob,phone_number,address,age,gender) values(?,?,?,?,?,?,?)");
 			stmt.setString(1, name);
 			stmt.setString(2, ssn);
 			stmt.setString(3, dob);
@@ -322,8 +297,7 @@ public class Manager {
 			stmt.setString(5, address);
 			stmt.setInt(6, age);
 			stmt.setString(7, gender);
-			stmt.setInt(8, processing_treatment_plan);
-			stmt.setString(9, completing_treatment);
+			
 			stmt.executeUpdate();
 			
 			String get_max_PID = "SELECT MAX(PID) AS PID FROM PATIENT ;" ;
@@ -340,7 +314,10 @@ public class Manager {
 			pid1 = rs1.getInt("PID");
 			
 		}catch(Exception e) {
+			
 			System.out.println(e);
+			System.out.println("Something went wrong, please try again \n");
+			addPatient(conn,person_id);
 		}
 		
 		return pid1 ;
@@ -348,6 +325,18 @@ public class Manager {
 	
 	public static void addStaff(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
 		try {
+			
+			conn.setAutoCommit(false);
+			String r = null ;
+			String role = null;
+			System.out.println("Select an option for Role :-> ");
+			System.out.println("1: Doctor, 2: Nurse, 3: Operator");
+			System.out.println("Press 0 to go back");
+			
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
 			
 			System.out.println("Enter Staff's Name :--> ");
 			String name = sc.next();
@@ -367,6 +356,7 @@ public class Manager {
 			System.out.println("Enter Staff's Department :--> ");
 			String department = sc.next();
 			
+			
 			PreparedStatement stmt = conn.prepareStatement("INSERT INTO staff (name,age,gender,job_title,professional_title,phone_number,address,department) values(?,?,?,?,?,?,?,?)");
 			stmt.setString(1, name);
 			stmt.setInt(2, age);
@@ -379,11 +369,61 @@ public class Manager {
 			
 			stmt.executeUpdate();
 			
+			String get_max_SID = "SELECT MAX(SID) AS SID FROM STAFF ;" ;
+			PreparedStatement stmt2 = conn.prepareStatement(get_max_SID);
+			ResultSet rs1 = stmt2.executeQuery();
+			  
+			rs1.next();
+			int sid = rs1.getInt("SID");
+			
+			PreparedStatement stmt1 = null;
+			switch(choice) {
+			case 1: //Add Doctor
+				 role = "Doctor";
+				 stmt1 = conn.prepareStatement("INSERT INTO doctor (SID) VALUES (?)");
+				 r = "D";
+				 break;
+				 
+			case 2: //Add Nurse
+				 role = "Nurse";
+				 stmt1 = conn.prepareStatement("INSERT INTO nurse (SID) VALUES (?);");
+				 r = "N";
+				 break;
+				 
+			case 3: //Add Operator
+				 role = "Operator";
+				 stmt1 = conn.prepareStatement("INSERT INTO operator (SID) VALUES (?);");
+				 r = "O";
+				 break;
+				 
+			default: //For other choices
+				System.out.println("Enter a Valid Choice ");
+				viewStaff(conn,person_id);
+				break;
+			}
+			
+			stmt1.setInt(1,sid);
+			stmt1.execute();
+			
+			PreparedStatement stmt3 = conn.prepareStatement("INSERT INTO USER_LOGIN values (?,'root',?,?)");
+			stmt3.setString(1, name);
+			stmt3.setInt(2,sid);
+			stmt3.setString(3, r);
+			stmt3.execute();
+			
+			conn.commit();
+			conn.setAutoCommit(true);
 			System.out.println("Staff added successfully");
+			
 			managerMenu(conn, person_id);
+			
 		}catch(Exception e) {
+			conn.rollback();
+			conn.setAutoCommit(true);
 			System.out.println(e);
+			System.out.println("Something went wrong, please try again \n");
 			managerMenu(conn, person_id);
+			
 		}
 	}
 	
@@ -393,21 +433,20 @@ public class Manager {
 			System.out.println("Enter the patient ID :-> ");
 			int pid=sc.nextInt();
 			
-			PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER,PROCESSING_TREATMENT_PLAN,COMPLETING_TREATMENT FROM PATIENT WHERE PID=?");
+			PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER FROM PATIENT WHERE PID=?");
 			stmt.setInt(1, pid);
 			ResultSet rs = stmt.executeQuery();
 			
 			if(rs.next()) {
 				System.out.println("PID : " + rs.getInt("PID"));
-				System.out.println("NAME : " + rs.getString("NAME"));
-				System.out.println("SSN : " + rs.getString("SSN"));
-				System.out.println("DOB : " + rs.getDate("DOB"));
-				System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
-				System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
-				System.out.println("AGE : " + rs.getInt("AGE"));
-				System.out.println("GENDER : " + rs.getString("GENDER"));
-				System.out.println("PROCESSING TREATMENT PLAN : " + rs.getInt("PROCESSING_TREATMENT_PLAN"));
-				System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+				System.out.println("1. NAME : " + rs.getString("NAME"));
+				System.out.println("2. SSN : " + rs.getString("SSN"));
+				System.out.println("3. DOB : " + rs.getDate("DOB"));
+				System.out.println("4. PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+				System.out.println("5. ADDRESS : " + rs.getString("ADDRESS"));
+				System.out.println("6. AGE : " + rs.getInt("AGE"));
+				System.out.println("7. GENDER : " + rs.getString("GENDER"));
+				
 				System.out.println("\n");
 			}
 			
@@ -415,7 +454,7 @@ public class Manager {
 			int choice = sc.nextInt();
 			
 			switch(choice) {
-				case 0: 
+				case 0: //Return back to Manager Menu
 					managerMenu(conn,person_id);
 					break;
 				
@@ -503,32 +542,10 @@ public class Manager {
 					System.out.println("Patient's gender edited successfully");
 					managerMenu(conn, person_id);
 					break;
-					
-				case 8: //Edit Processing Treatment Plan
-					System.out.println("Enter new processing treatment plan: --> ");
-					int processing_treatment_plan = sc.nextInt();
-					stmt = conn.prepareStatement(
-					"UPDATE PATIENT SET PROCESSING_TREATMENT_PLAN = ? WHERE PID=?");
-					stmt.setInt(1, processing_treatment_plan);
-					stmt.setInt(2, pid);
-					stmt.executeUpdate();
-					System.out.println("Patient's processing treatment plan edited successfully");
-					managerMenu(conn, person_id);
-					break;
-					
-				case 9: //Edit Completing Treatment
-					System.out.println("Enter new completing treatment status: --> ");
-					String completing_treatment = sc.next();
-					stmt = conn.prepareStatement(
-					"UPDATE PATIENT SET COMPLETING_TREATMENT = ? WHERE PID=?");
-					stmt.setString(1, completing_treatment);
-					stmt.setInt(2, pid);
-					stmt.executeUpdate();
-					System.out.println("Patient's Completing treatment status edited successfully");
-					managerMenu(conn, person_id);
-					break;
-					
-				default:
+						
+				default: //Enter Valid Choice
+					System.out.println("Enter a Valid Choice ");
+					editPatient(conn,person_id);
 					break;
 			}
 			
@@ -551,13 +568,14 @@ public class Manager {
 			if(rs.next()) {
 				System.out.println("SID : " + rs.getInt("SID"));
 				System.out.println("NAME : " + rs.getString("NAME"));
-				System.out.println("AGE : " + rs.getInt("AGE"));
-				System.out.println("GENDER : " + rs.getString("GENDER"));
 				System.out.println("JOB TITLE : " + rs.getString("JOB_TITLE"));
-				System.out.println("PROFESSIONAL TITLE : " + rs.getString("PROFESSIONAL_TITLE"));
-				System.out.println("PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
-				System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
-				System.out.println("DEPARTMENT : " + rs.getString("DEPARTMENT"));
+				System.out.println("1. AGE : " + rs.getInt("AGE"));
+				System.out.println("2. GENDER : " + rs.getString("GENDER"));
+				
+				System.out.println("3. PROFESSIONAL TITLE : " + rs.getString("PROFESSIONAL_TITLE"));
+				System.out.println("4. PHONE NUMBER : " + rs.getString("PHONE_NUMBER"));
+				System.out.println("5. ADDRESS : " + rs.getString("ADDRESS"));
+				System.out.println("6. DEPARTMENT : " + rs.getString("DEPARTMENT"));
 				System.out.println("\n");
 			}
 			
@@ -565,23 +583,12 @@ public class Manager {
 			int choice = sc.nextInt();
 			
 			switch(choice) {
-				case 0: 
+				case 0: //Return back to Manager Menu
 					managerMenu(conn,person_id);
 					break;
 				
-				case 1: //Edit name
-					System.out.println("Enter new Name: --> ");
-					String name = sc.next();
-					stmt = conn.prepareStatement(
-					"UPDATE STAFF SET NAME = ? WHERE SID=?");
-					stmt.setString(1, name);
-					stmt.setInt(2, sid);
-					stmt.executeUpdate();
-					System.out.println("Staff's name edited successfully");
-					managerMenu(conn, person_id);
-					break;
 					
-				case 2: //Edit Age
+				case 1: //Edit Age
 					System.out.println("Enter new Age: --> ");
 					int age = sc.nextInt();
 					stmt = conn.prepareStatement(
@@ -593,7 +600,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;	
 					
-				case 3: //Edit Gender
+				case 2: //Edit Gender
 					System.out.println("Enter new Gender: --> ");
 					String gender = sc.next();
 					stmt = conn.prepareStatement(
@@ -605,19 +612,8 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;
 					
-				case 4: //Edit Job Title
-					System.out.println("Enter new Job Title: --> ");
-					String job_title = sc.next();
-					stmt = conn.prepareStatement(
-					"UPDATE STAFF SET JOB_TITLE = ? WHERE SID=?");
-					stmt.setString(1, job_title);
-					stmt.setInt(2, sid);
-					stmt.executeUpdate();
-					System.out.println("Staff's Job Title edited successfully");
-					managerMenu(conn, person_id);
-					break;
 					
-				case 5: //Edit Professional Title
+				case 3: //Edit Professional Title
 					System.out.println("Enter new Professional Title: --> ");
 					String professional_title = sc.next();
 					stmt = conn.prepareStatement(
@@ -629,7 +625,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;
 					
-				case 6: //Edit Phone Number
+				case 4: //Edit Phone Number
 					System.out.println("Enter new phone number: --> ");
 					String phone_number = sc.next();
 					stmt = conn.prepareStatement(
@@ -641,7 +637,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;
 					
-				case 7: //Edit Address
+				case 5: //Edit Address
 					System.out.println("Enter new Address: --> ");
 					sc.nextLine();
 					String address = sc.nextLine();
@@ -654,7 +650,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;
 					
-				case 8: //Edit Department
+				case 6: //Edit Department
 					System.out.println("Enter new Department: --> ");
 					String department = sc.next();
 					stmt = conn.prepareStatement(
@@ -666,7 +662,9 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;
 				
-				default:
+				default: //Enter Valid Choice
+					System.out.println("Enter a Valid Choice ");
+					editStaff(conn,person_id);
 					break;
 			}
 			
@@ -689,7 +687,8 @@ public class Manager {
 			managerMenu(conn,person_id);
 			
 		}catch(Exception ex) {
-			System.out.println("No Entry corresponding to your choice can be found" + ex);
+			System.out.println("Something went wrong, please try again" + ex);
+			managerMenu(conn,person_id);
 		}
 	}
 	
@@ -706,7 +705,8 @@ public class Manager {
 			managerMenu(conn,person_id);
 			
 		}catch(Exception ex) {
-			System.out.println("No Entry corresponding to your choice can be found" + ex);
+			System.out.println("Something went wrong, please try again" + ex);
+			managerMenu(conn,person_id);
 		}
 	}
 	
@@ -737,7 +737,8 @@ public class Manager {
 				managerMenu(conn, person_id);
 			}			
 		}catch(Exception ex) {
-			System.out.println("Exception" + ex);
+			System.out.println("Something went wrong, please try again" + ex);
+			managerMenu(conn,person_id);
 		}
 	}
 	
@@ -775,12 +776,15 @@ public class Manager {
 			
 			System.out.println("Enter Ward ID :--> ");
 			int wid = sc.nextInt();
+			System.out.println("Enter Bed ID :--> ");
+			int bid = sc.nextInt();
 			System.out.println("Enter availability status :--> ");
 			int availability = sc.nextInt();
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO bed (wid,availability) values(?,?)");
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO bed (wid,Bed_ID,availability) values(?,?,?)");
 			stmt.setInt(1, wid);
-			stmt.setInt(2, availability);
+			stmt.setInt(2, bid);
+			stmt.setInt(3, availability);
 			stmt.executeUpdate();
 			
 			System.out.println("Bed added successfully");
@@ -791,85 +795,31 @@ public class Manager {
 		}
 	}
 	
-	public static void updateBed(Connection conn, int person_id) {
-		try {
-			System.out.println("----------------------Edit Bed's Information--------------------");
-			System.out.println("Enter the Bed ID :-> ");
-			int bid=sc.nextInt();
-			
-			PreparedStatement stmt = conn.prepareStatement("SELECT WID,BID,AVAILABILITY FROM WARD WHERE BID=?");
-			stmt.setInt(1, bid);
-			ResultSet rs = stmt.executeQuery();
-			
-			if(rs.next()) {
-				System.out.println("WID : " + rs.getInt("WID"));
-				System.out.println("BID : " + rs.getInt("BID"));
-				System.out.println("AVAILABILITY : " + rs.getInt("AVAILABILITY"));
-				System.out.println("\n");
-			}
-			
-			System.out.println("Enter your selection to edit(Press 0 to go back): -->");
-			int choice = sc.nextInt();
-			
-			switch(choice) {
-				case 0: 
-					managerMenu(conn,person_id);
-					break;
-				
-				case 1: //Edit Ward 
-					System.out.println("Enter new Ward ID: --> ");
-					int wid = sc.nextInt();
-					stmt = conn.prepareStatement(
-					"UPDATE BED SET WID = ? WHERE BID=?");
-					stmt.setInt(1, wid);
-					stmt.setInt(2, bid);
-					stmt.executeUpdate();
-					System.out.println("Ward edited successfully");
-					managerMenu(conn, person_id);
-					break;
-					
-				case 2: //Edit Ward Availability
-					System.out.println("Change Availability: --> ");
-					int availability = sc.nextInt();
-					stmt = conn.prepareStatement(
-					"UPDATE BED SET AVAILABILITY = ? WHERE BID=?");
-					stmt.setInt(1, availability);
-					stmt.setInt(2, bid);
-					stmt.executeUpdate();
-					System.out.println("Bed availability edited successfully");
-					managerMenu(conn, person_id);
-					break;	
-				
-				default:
-					break;
-			}
-			
-		}
-		catch(Exception ex) {
-			System.out.println(ex);
-		}
-	}
 	
 	public static void deleteBed(Connection conn, int person_id) {
 		try {
 			System.out.println("----------------------Delete Bed--------------------");
+			System.out.println("Enter the Ward ID :-> ");
+			int wid = sc.nextInt();
 			System.out.println("Enter the bed ID :-> ");
 			int bid=sc.nextInt();
 			
-			PreparedStatement stmt = conn.prepareStatement("DELETE FROM BED WHERE BID=?");
+			PreparedStatement stmt = conn.prepareStatement("DELETE FROM BED WHERE Bed_ID=? AND WID=?");
 			stmt.setInt(1, bid);
+			stmt.setInt(2, wid);
 			stmt.executeUpdate();
 			System.out.println("Bed " + " "+bid+" " + "deleted succefully");
 			managerMenu(conn,person_id);
 			
 		}catch(Exception ex) {
-			System.out.println("No Entry corresponding to your choice can be found" + ex);
+			System.out.println("Something went wrong, please try again" + ex);
+			managerMenu(conn,person_id);
 		}
 	}
 	
 	public static void addWard(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
 		try {
-			
+					
 			System.out.println("Enter ID for Responsible Nurse :--> ");
 			int sid = sc.nextInt();
 			System.out.println("Enter charges for ward :--> ");
@@ -900,8 +850,8 @@ public class Manager {
 			
 			if(rs.next()) {
 				System.out.println("WID : " + rs.getInt("WID"));
-				System.out.println("SID : " + rs.getInt("SID"));
-				System.out.println("CHARGES : " + rs.getInt("CHARGES"));
+				System.out.println("1. SID : " + rs.getInt("SID"));
+				System.out.println("2. CHARGES : " + rs.getInt("CHARGES"));
 				System.out.println("\n");
 			}
 			
@@ -909,7 +859,7 @@ public class Manager {
 			int choice = sc.nextInt();
 			
 			switch(choice) {
-				case 0: 
+				case 0: //Return to Manager Menu
 					managerMenu(conn,person_id);
 					break;
 				
@@ -937,13 +887,15 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;	
 				
-				default:
-					break;
+				default: //Enter Valid Choice
+					System.out.println("Enter Valid Choice");
+					updateWard(conn,person_id);
 			}
 			
 		}
 		catch(Exception ex) {
-			System.out.println(ex);
+			System.out.println("Something went wrong, please try again" + ex);
+			managerMenu(conn,person_id);
 		}
 	}
 	
@@ -960,11 +912,12 @@ public class Manager {
 			managerMenu(conn,person_id);
 			
 		}catch(Exception ex) {
-			System.out.println("No Entry corresponding to your choice can be found" + ex);
+			System.out.println("Something went wrong, please try again" + ex);
+			managerMenu(conn,person_id);
 		}
 	}
 	
-	public static void responsibleDoctor(Connection conn, int person_id) {
+	private static void responsibleDoctor(Connection conn, int person_id) {
 		try {
 			System.out.println("----------------------Patients for whom the Doctor is responsible--------------------");
 			System.out.println("Enter the Doctor ID :-> ");
@@ -985,8 +938,7 @@ public class Manager {
 				System.out.println("ADDRESS : " + rs.getString("ADDRESS"));
 				System.out.println("AGE : " + rs.getInt("AGE"));
 				System.out.println("GENDER : " + rs.getString("GENDER"));
-				System.out.println("PROCESSING TREATMENT PLAN : " + rs.getString("PROCESSING_TREATMENT_PLAN"));
-				System.out.println("COMPLETING TREATMENT : " + rs.getString("COMPLETING_TREATMENT"));
+				
 				System.out.println("\n");
 			}
 			
@@ -1001,7 +953,8 @@ public class Manager {
 				managerMenu(conn, person_id);
 			}			
 		}catch(Exception ex) {
-			System.out.println("Exception" + ex);
+			System.out.println("Something went wrong, please try again" + ex);
+			managerMenu(conn,person_id);
 		}
 	}
 	
