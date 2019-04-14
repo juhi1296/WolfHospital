@@ -17,7 +17,7 @@ public class Manager {
 			System.out.println("----------------------------Welcome Manager----------------------------");
 			System.out.println("1. View Patients"); 
 			System.out.println("2. View Staff");
-			System.out.println("3. Add Patient");
+			//System.out.println("3. Add Patient");
 			System.out.println("4. Add Staff"); 
 			System.out.println("5. Update Patient"); 
 			System.out.println("6. Update Staff"); 
@@ -46,21 +46,21 @@ public class Manager {
 				viewStaff(conn,person_id);
 				break;
 			
-			case 3:
-				int pid = addPatient(conn,person_id);
-				System.out.println("Patient with PID "+ pid + "added successfully");
-				System.out.println("Press 0 to go back");
-				int choice = sc.nextInt();
-				if (choice == 0) {
-					managerMenu(conn, person_id);
-				}
-				else
-				{
-					validChoice(0);
-					managerMenu(conn, person_id);
-				}		
-				break;
-				
+//			case 3:
+//				int pid = addPatient(conn,person_id);
+//				System.out.println("Patient with PID "+ pid + " added successfully");
+//				System.out.println("Press 0 to go back");
+//				int choice = sc.nextInt();
+//				if (choice == 0) {
+//					managerMenu(conn, person_id);
+//				}
+//				else
+//				{
+//					validChoice(0);
+//					managerMenu(conn, person_id);
+//				}		
+//				break;
+//				
 			case 4:
 				addStaff(conn,person_id);
 				break;
@@ -293,7 +293,6 @@ public class Manager {
 		int pid1 = 0;
 		try {
 			
-			
 			System.out.println("Enter Patient's Name :--> ");
 			String name = sc.next();
 			System.out.println("Enter Patient's SSN (###-##-####):--> ");
@@ -309,12 +308,8 @@ public class Manager {
 			int age = sc.nextInt();
 			System.out.println("Enter Patient's Gender :--> ");
 			String gender = sc.next();
-			System.out.println("Enter Patient's Processing Treatment Plan :--> ");
-			int processing_treatment_plan = sc.nextInt();
-			System.out.println("Enter Patient's Completing Treatment :--> ");
-			String completing_treatment = sc.next();
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO patient (name,ssn,dob,phone_number,address,age,gender,processing_treatment_plan,completing_treatment) values(?,?,?,?,?,?,?,?,?)");
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO patient (name,ssn,dob,phone_number,address,age,gender) values(?,?,?,?,?,?,?)");
 			stmt.setString(1, name);
 			stmt.setString(2, ssn);
 			stmt.setString(3, dob);
@@ -322,8 +317,7 @@ public class Manager {
 			stmt.setString(5, address);
 			stmt.setInt(6, age);
 			stmt.setString(7, gender);
-			stmt.setInt(8, processing_treatment_plan);
-			stmt.setString(9, completing_treatment);
+			
 			stmt.executeUpdate();
 			
 			String get_max_PID = "SELECT MAX(PID) AS PID FROM PATIENT ;" ;
@@ -340,7 +334,10 @@ public class Manager {
 			pid1 = rs1.getInt("PID");
 			
 		}catch(Exception e) {
+			
 			System.out.println(e);
+			System.out.println("Something went wrong, please try again \n");
+			addPatient(conn,person_id);
 		}
 		
 		return pid1 ;
@@ -348,6 +345,18 @@ public class Manager {
 	
 	public static void addStaff(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
 		try {
+			
+			conn.setAutoCommit(false);
+			String r = null ;
+			String role = null;
+			System.out.println("Select an option for Role :-> ");
+			System.out.println("1: Doctor, 2: Nurse, 3: Operator");
+			System.out.println("Press 0 to go back");
+			
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
 			
 			System.out.println("Enter Staff's Name :--> ");
 			String name = sc.next();
@@ -367,6 +376,7 @@ public class Manager {
 			System.out.println("Enter Staff's Department :--> ");
 			String department = sc.next();
 			
+			
 			PreparedStatement stmt = conn.prepareStatement("INSERT INTO staff (name,age,gender,job_title,professional_title,phone_number,address,department) values(?,?,?,?,?,?,?,?)");
 			stmt.setString(1, name);
 			stmt.setInt(2, age);
@@ -379,11 +389,58 @@ public class Manager {
 			
 			stmt.executeUpdate();
 			
+			String get_max_SID = "SELECT MAX(SID) AS SID FROM STAFF ;" ;
+			PreparedStatement stmt2 = conn.prepareStatement(get_max_SID);
+			ResultSet rs1 = stmt2.executeQuery();
+			  
+			rs1.next();
+			int sid = rs1.getInt("SID");
+			
+			PreparedStatement stmt1 = null;
+			switch(choice) {
+			case 1: 
+				 role = "Doctor";
+				 stmt1 = conn.prepareStatement("INSERT INTO doctor (SID) VALUES (?)");
+				 r = "D";
+				 break;
+			case 2:
+				 role = "Nurse";
+				 stmt1 = conn.prepareStatement("INSERT INTO nurse (SID) VALUES (?);");
+				 r = "N";
+				 break;
+			case 3:
+				 role = "Operator";
+				 stmt1 = conn.prepareStatement("INSERT INTO operator (SID) VALUES (?);");
+				 r = "O";
+				 break;
+			default:
+				System.out.println("Enter a Valid Choice ");
+				viewStaff(conn,person_id);
+				break;
+			}
+			
+			stmt1.setInt(1,sid);
+			stmt1.execute();
+			
+			PreparedStatement stmt3 = conn.prepareStatement("INSERT INTO USER_LOGIN values (?,'root',?,?)");
+			stmt3.setString(1, name);
+			stmt3.setInt(2,sid);
+			stmt3.setString(3, r);
+			stmt3.execute();
+			
+			conn.commit();
+			conn.setAutoCommit(true);
 			System.out.println("Staff added successfully");
+			
 			managerMenu(conn, person_id);
+			
 		}catch(Exception e) {
+			conn.rollback();
+			conn.setAutoCommit(true);
 			System.out.println(e);
+			System.out.println("Something went wrong, please try again \n");
 			managerMenu(conn, person_id);
+			
 		}
 	}
 	
