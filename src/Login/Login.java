@@ -47,25 +47,17 @@ public class Login {
 	String user = scan.nextLine();
 	System.out.println("Enter Password:-> ");
 	String pwd = scan.nextLine();
-	PreparedStatement stmt = conn.prepareStatement("SELECT USERNAME,PWD,ROLE,PERSON_ID FROM USER_LOGIN WHERE USERNAME=?");
+	PreparedStatement stmt = conn.prepareStatement("SELECT USERNAME,PWD,ROLE,PERSON_ID FROM USER_LOGIN WHERE USERNAME=? AND PWD = ?");
 	stmt.setString(1, user);
+	stmt.setString(2, pwd);
 	ResultSet rs = stmt.executeQuery();
 	if (!rs.next()) {
 		System.out.println("Login Incorrect.\n");
 		loginmenu();
 	}
-	String data_pwd = rs.getString("PWD");
-    String username = rs.getString("USERNAME");
-    String role = rs.getString("ROLE");
-    int person_id = rs.getInt("PERSON_ID");
-    
-   
-    if (!pwd.equals(data_pwd)) 
-    {
-        System.out.println("Login Incorrect.");
-        loginmenu();
-    }
-    else {
+	else {
+    	String role = rs.getString("ROLE");
+        int person_id = rs.getInt("PERSON_ID");
     	if(role.equals("D")) {
     		Doctor d = new Doctor();
     		d.doctorMenu(conn,person_id);
