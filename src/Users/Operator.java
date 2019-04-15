@@ -29,6 +29,7 @@ public class Operator {
 		System.out.println("11. Logout");
 		System.out.println("12. Check In Patient");
 		System.out.println("13. Check Out Patient");
+		System.out.println("14. Assign Doctor to Patient");
 		System.out.println("Enter your choice :-> ");
 		
 		int doctor_choice = sc.nextInt();
@@ -36,10 +37,6 @@ public class Operator {
 		switch(doctor_choice) {
 		case 1: 
 			pid = registerPatient(conn,person_id);
-			break;
-			
-		case 2:
-			checkoutPatient(conn,person_id);
 			break;
 			
 		
@@ -59,6 +56,9 @@ public class Operator {
 		case 13:
 			checkout(conn,person_id);
 			break;
+		
+		case 14:
+			assignDoc(conn, person_id);
 			
 		}
 		
@@ -66,7 +66,7 @@ public class Operator {
 			System.out.println("Exception" + ex);
 		}
 	}
-	private void checkout(Connection conn, int person_id) {
+	private void checkout(Connection conn, int person_id) throws SQLException {
 		try {
 			conn.setAutoCommit(false);
 			System.out.println("Enter Patient ID for Check out : ");
@@ -77,6 +77,8 @@ public class Operator {
 			releaseBed(conn,person_id,pid); // add arg end_date
 			
 			generateBill(conn,person_id,pid);
+			
+			removeDocandupdateMedRec(conn,pid);
 			
 			PreparedStatement stmt = conn.prepareStatement("delete from patient_is_assigned_bed where PID = ?");
 			stmt.setInt(1, pid);
@@ -89,16 +91,13 @@ public class Operator {
 			
 			System.out.println("CHECKED OUT");
 			conn.commit();
-			
+			conn.setAutoCommit(true);
 		}catch(Exception ex) {
-			try {
-				conn.rollback();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			System.out.println("Exception" + ex);
+			conn.rollback();
+			conn.setAutoCommit(true);
+			System.out.println(ex);
+			System.out.println("Something went wrong, please try again \n");
+			operatorMenu(conn, person_id);
 		}
 		
 	}
@@ -130,7 +129,7 @@ public class Operator {
 			System.out.println("Accomodation fee successfully updated \n");
 						
 		}catch(Exception ex) {
-			
+			ex.getStackTrace();
 		}
 	}
 	private void checkin(Connection conn, int person_id) {
@@ -218,7 +217,6 @@ public class Operator {
 			System.out.println("Enter End Date :-> ");
 			String end_date = sc.next();
 			
-			conn.setAutoCommit(false);
 			
 			PreparedStatement stmt1 = conn.prepareStatement("select WID,Bed_ID from patient_is_assigned_bed where PID = ? AND end_date is null");
 			stmt1.setInt(1, pid);
@@ -237,18 +235,11 @@ public class Operator {
 			stmt2.setInt(1, bed_id);
 			stmt2.setInt(2, wid);
 			stmt2.execute();
-			
-			conn.commit();
-			
+
 			System.out.println("BED released successfully");
 			
 		}catch(Exception ex) {
-			try {
-				conn.rollback();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			
 			System.out.println("Exception" + ex);
 		}
 		
@@ -305,11 +296,7 @@ public class Operator {
 		}
 		
 	}
-	private void checkoutPatient(Connection conn, int person_id) {
-		// TODO Auto-generated method stub
-		
-		
-	}
+
 	private int registerPatient(Connection conn, int person_id) {
 		// TODO Auto-generated method stub
 		int pid = 0;
@@ -324,6 +311,63 @@ public class Operator {
 		return pid; 
 	}
 	
+	private void assignDoc(Connection conn, int person_id) {
+		try {
+		System.out.println("Enter doctor ID :=> ");
+		int DID = sc.nextInt();
+		System.out.println("Enter Patient ID :=> ");
+		int PID = sc.nextInt();
+		String insert_treats = "INSERT INTO TREATS VALUES(?,?)";
+		
+		PreparedStatement stmt = conn.prepareStatement(insert_treats);
+		
+		stmt.setInt(1,PID);
+		stmt.setInt(2,DID);
+		
+		stmt.execute();
+		
+		System.out.println("Doctor " + DID +" successfully assigned to patient " + PID);
+		
+		operatorMenu(conn,person_id);
+		
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
 	
+	private void removeDocandupdateMedRec(Connection conn, int PID) {
+		try {
 
-}
+		PreparedStatement stmt = null;	
+		String getdocAssigned = "SELECT SID FROM TREATS WHERE PID = ?"; 	
+			stmt = conn.prepareStatement(getdocAssigned);
+			stmt.setInt(1, PID);
+			ResultSet rs = stmt.executeQuery();
+			int DID = 0;
+			if(rs.next()) {
+				DID = rs.getInt("SID");
+			}
+			
+			
+		String update_med_rec = "UPDATE medical_records SET responsible_doctor = ? WHERE PID = ? AND end_date IS NULL";
+			stmt = conn.prepareStatement(update_med_rec);
+			stmt.setInt(1, DID);
+			stmt.setInt(2, PID);
+			stmt.execute();
+		
+		String del_treats = "DELETE FROM TREATS WHERE PID = ?";
+		stmt = conn.prepareStatement(del_treats);
+		stmt.setInt(1, PID);
+		stmt.execute();
+		System.out.println("updated Treats and Medical Record");
+		
+		} catch (SQLException e) {
+			
+				e.printStackTrace();
+			}
+			
+		}
+		
+		
+	}
