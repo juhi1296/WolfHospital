@@ -20,85 +20,89 @@ public class Manager {
 			System.out.println("3. Add Staff"); 
 			System.out.println("4. Update Patient"); 
 			System.out.println("5. Update Staff"); 
-			System.out.println("6. Remove Staff");
-			System.out.println("7. Get Ward Usage"); 
-			System.out.println("8. View Patient Statistics"); 
-			System.out.println("9. Add Ward Information");
-			System.out.println("10. Update Ward Information");
-			System.out.println("11. Delete Ward Information");
-			System.out.println("12. Add New Bed to ward");
-			System.out.println("13. Delete Bed Information");
-			System.out.println("14. Doctor responsible for patients");
-			System.out.println("15. Logout");
+			System.out.println("6. Delete Patient");
+			System.out.println("7. Remove Staff");
+			System.out.println("8. Get Ward Usage"); 
+			System.out.println("9. View Patient Statistics"); 
+			System.out.println("10. Add Ward Information");
+			System.out.println("11. Update Ward Information");
+			System.out.println("12. Delete Ward Information");
+			System.out.println("13. Add New Bed to ward");
+			System.out.println("14. Delete Bed Information");
+			System.out.println("15. Doctor responsible for patients");
+			System.out.println("16. Logout");
 			System.out.println("Enter your choice :-> ");
 			
 			int manager_choice = sc.nextInt();
 			
 			switch(manager_choice) {
-			case 1: 
+			case 1: //View all patients or View a particular patient
 				viewPatients(conn,person_id);
 				break;
 			
-			case 2:
+			case 2: //View staff information based on their roles
 				viewStaff(conn,person_id);
 				break;
 			
-
-			case 3:
+			case 3: //Add new staff 
 				addStaff(conn,person_id);
 				break;
 				
-			case 4:
+			case 4: //Update information of existing patient
 				editPatient(conn,person_id);
 				break;
 				
-			case 5:
+			case 5: //Update information of existing staff
 				editStaff(conn,person_id);
 				break;
+			
+			case 6: //Delete existing patient
+				deletePatient(conn,person_id);
+				break;	
 				
-			case 6:
+			case 7: //Delete existing staff
 				deleteStaff(conn,person_id);
 				break;
 				
-			case 7:
+			case 8: //Get Ward Usage Percentage
 				wardUsage(conn,person_id);
 				break;
 				
-			case 8:
+			case 9: //Get number of Patients per month
 				patientsPerMonth(conn,person_id);
 				break;
 				
-			case 9:
+			case 10: //Add new Ward information
 				addWard(conn,person_id);
 				break;
 				
-			case 10: 
+			case 11: //Update information of existing ward
 				updateWard(conn,person_id);
 				break;
 				
-			case 11:
+			case 12: //Delete existing ward information
 				deleteWard(conn,person_id);
 				break;
 				
-			case 12:
+			case 13: //Add new Bed information
 				addBed(conn,person_id);
 				break;
 				
-			case 13:
+			case 14: //Delete existing bed 
 				deleteBed(conn,person_id);
 				break;
 				
-			case 14:
+			case 15: //All patients treated by a particular doctor
 				responsibleDoctor(conn,person_id);
 				break;
 				
-			case 15:
+			case 16: //Logout
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
 				System.exit(0);
 				break;	
 									
-			default:
+			default: //Invalid option selected. Throw back to previous menu.
 				System.out.println("Enter Valid choice");
 				managerMenu(conn,person_id);
 				break;	
@@ -120,14 +124,13 @@ public class Manager {
 			System.out.println("Press 0 to go back");
 			System.out.println("Enter your choice :-> ");
 		
-
 			int ch=sc.nextInt();
 			
-			if (ch == 0) {
+			if (ch == 0) { //Return to Manager Menu
 				managerMenu(conn, person_id);
 			}
 			
-			else if(ch == 1) {
+			else if(ch == 1) { //View information on all patients
 				PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER FROM PATIENT");
 				ResultSet rs = stmt.executeQuery();
 				while(rs.next()) {
@@ -154,7 +157,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 				}
 			}
-			else if(ch == 2) {
+			else if(ch == 2) { //View information of a particular patient
 				System.out.println("Enter the patient ID :-> ");
 				  int pid=sc.nextInt();
 				  
@@ -207,25 +210,28 @@ public class Manager {
 			System.out.println("Press 0 to go back");
 			
 			int choice = sc.nextInt();
-			if (choice == 0) {
+			if (choice == 0) { //Return back to Manager Menu
 				managerMenu(conn, person_id);
 			}
 			
 			PreparedStatement stmt = null;
 			switch(choice) {
-			case 1: 
+			case 1: //View Doctor Information
 				 role = "Doctor";
 				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,DOCTOR WHERE DOCTOR.SID = staff.SID");
 				 break;
-			case 2:
+				 
+			case 2: //View Nurse Information
 				 role = "Nurse";
 				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,NURSE WHERE NURSE.SID = staff.SID");
 				 break;
-			case 3:
+				 
+			case 3: //View Operator Information
 				 role = "Operator";
 				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,OPERATOR WHERE OPERATOR.SID = staff.SID");
 				 break;
-			default:
+				 
+			default: //For other input
 				System.out.println("Enter a Valid Choice ");
 				viewStaff(conn,person_id);
 				break;
@@ -372,22 +378,25 @@ public class Manager {
 			
 			PreparedStatement stmt1 = null;
 			switch(choice) {
-			case 1: 
+			case 1: //Add Doctor
 				 role = "Doctor";
 				 stmt1 = conn.prepareStatement("INSERT INTO doctor (SID) VALUES (?)");
 				 r = "D";
 				 break;
-			case 2:
+				 
+			case 2: //Add Nurse
 				 role = "Nurse";
 				 stmt1 = conn.prepareStatement("INSERT INTO nurse (SID) VALUES (?);");
 				 r = "N";
 				 break;
-			case 3:
+				 
+			case 3: //Add Operator
 				 role = "Operator";
 				 stmt1 = conn.prepareStatement("INSERT INTO operator (SID) VALUES (?);");
 				 r = "O";
 				 break;
-			default:
+				 
+			default: //For other choices
 				System.out.println("Enter a Valid Choice ");
 				viewStaff(conn,person_id);
 				break;
@@ -445,7 +454,7 @@ public class Manager {
 			int choice = sc.nextInt();
 			
 			switch(choice) {
-				case 0: 
+				case 0: //Return back to Manager Menu
 					managerMenu(conn,person_id);
 					break;
 				
@@ -534,7 +543,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;
 						
-				default:
+				default: //Enter Valid Choice
 					System.out.println("Enter a Valid Choice ");
 					editPatient(conn,person_id);
 					break;
@@ -574,7 +583,7 @@ public class Manager {
 			int choice = sc.nextInt();
 			
 			switch(choice) {
-				case 0: 
+				case 0: //Return back to Manager Menu
 					managerMenu(conn,person_id);
 					break;
 				
@@ -653,7 +662,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;
 				
-				default:
+				default: //Enter Valid Choice
 					System.out.println("Enter a Valid Choice ");
 					editStaff(conn,person_id);
 					break;
@@ -786,68 +795,6 @@ public class Manager {
 		}
 	}
 	
-	/*public static void updateBed(Connection conn, int person_id) {
-		try {
-			System.out.println("----------------------Edit Bed's Information--------------------");
-			System.out.println("Enter the Ward ID :-> ");
-			int wid = sc.nextInt();
-			System.out.println("Enter the Bed ID :-> ");
-			int bid=sc.nextInt();
-			
-			PreparedStatement stmt = conn.prepareStatement("SELECT WID,BID,AVAILABILITY FROM WARD WHERE Bed_ID=? AND WID = ?");
-			stmt.setInt(1, bid);
-			stmt.setInt(2, wid);
-			ResultSet rs = stmt.executeQuery();
-			
-			if(rs.next()) {
-				
-				System.out.println("1. WID : " + rs.getInt("WID"));
-				System.out.println("BID : " + rs.getInt("BID"));
-				System.out.println("AVAILABILITY : " + rs.getInt("AVAILABILITY"));
-				System.out.println("\n");
-			}
-			
-			System.out.println("Enter your selection to edit(Press 0 to go back): -->");
-			int choice = sc.nextInt();
-			
-			switch(choice) {
-				case 0: 
-					managerMenu(conn,person_id);
-					break;
-				
-				case 1: //Edit Ward 
-					System.out.println("Enter new Ward ID: --> ");
-					int wid = sc.nextInt();
-					stmt = conn.prepareStatement(
-					"UPDATE BED SET WID = ? WHERE BID=?");
-					stmt.setInt(1, wid);
-					stmt.setInt(2, bid);
-					stmt.executeUpdate();
-					System.out.println("Ward edited successfully");
-					managerMenu(conn, person_id);
-					break;
-					
-				case 2: //Edit Ward Availability
-					System.out.println("Change Availability: --> ");
-					int availability = sc.nextInt();
-					stmt = conn.prepareStatement(
-					"UPDATE BED SET AVAILABILITY = ? WHERE BID=?");
-					stmt.setInt(1, availability);
-					stmt.setInt(2, bid);
-					stmt.executeUpdate();
-					System.out.println("Bed availability edited successfully");
-					managerMenu(conn, person_id);
-					break;	
-				
-				default:
-					break;
-			}
-			
-		}
-		catch(Exception ex) {
-			System.out.println(ex);
-		}
-	}*/
 	
 	public static void deleteBed(Connection conn, int person_id) {
 		try {
@@ -872,8 +819,7 @@ public class Manager {
 	
 	public static void addWard(Connection conn, int person_id) throws ParseException, SQLException, InterruptedException {
 		try {
-			
-			
+					
 			System.out.println("Enter ID for Responsible Nurse :--> ");
 			int sid = sc.nextInt();
 			System.out.println("Enter charges for ward :--> ");
@@ -913,7 +859,7 @@ public class Manager {
 			int choice = sc.nextInt();
 			
 			switch(choice) {
-				case 0: 
+				case 0: //Return to Manager Menu
 					managerMenu(conn,person_id);
 					break;
 				
@@ -941,7 +887,7 @@ public class Manager {
 					managerMenu(conn, person_id);
 					break;	
 				
-				default:
+				default: //Enter Valid Choice
 					System.out.println("Enter Valid Choice");
 					updateWard(conn,person_id);
 			}
