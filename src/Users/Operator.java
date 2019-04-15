@@ -17,29 +17,35 @@ public class Operator {
 		try {
 		System.out.println("----------------------------Welcome Operator----------------------------");
 		//System.out.println("1. Check In Patient");
-		System.out.println("2. Check Out Patient");
-		System.out.println("3 Assign Doctor to Patient");
-		System.out.println("4. Register new patient");
-		System.out.println("5. Get patient ID of registered patients");
-		System.out.println("6. Assign Bed");
-		System.out.println("7. Create Billing Account and Medical Record for the visit");
+		
+		System.out.println("1. Register new patient");
+		System.out.println("2. Get patient ID of registered patients");
+		System.out.println("3. Assign Bed");
+		System.out.println("4 Assign Doctor to Patient");
+		System.out.println("5. Create Billing Account and Medical Record for the visit");
+		
+		System.out.println("6. Check Out Patient");
+		System.out.println("7. Get Ward and Bed assigned to a patient");
+		
+		//System.out.println("8. remove doc assigned");
+		
 		System.out.println("Enter your choice :-> ");
 		
 		int doctor_choice = sc.nextInt();
 		
 		switch(doctor_choice) {
 		
-		case 4: pid = registerPatient(conn,person_id);
+		case 1: pid = registerPatient(conn,person_id);
 				System.out.println("Patient with PID " + pid + " successfully added");
 				operatorMenu(conn, person_id);
 				break;
 		
-		case 5: pid = getRegisteredPatient(conn,person_id);		
+		case 2: pid = getRegisteredPatient(conn,person_id);		
 				System.out.println("PID of patient: " + pid);
 				operatorMenu(conn, person_id);
 				break;
 				
-		case 6:	
+		case 3:	
 				System.out.println("Enter patient ID");
 				pid = sc.nextInt();
 				if(!assignBed(conn,pid,person_id))
@@ -50,7 +56,11 @@ public class Operator {
 				operatorMenu(conn, person_id);
 				break;
 		
-		case 7: 	
+		case 4:
+				assignDoc(conn, person_id);
+				break;
+			
+		case 5: 	
 				System.out.println("Enter patient ID");
 				pid = sc.nextInt();
 				genMedAndBillAcc(conn,person_id,pid);
@@ -61,37 +71,57 @@ public class Operator {
 		//	checkin(conn,person_id);
 			//break;
 		
-		case 2:
+		case 6:
 			checkout(conn,person_id);
 			break;
 		
-		case 3:
-			assignDoc(conn, person_id);
-			break;
+		case 7: 
+				System.out.println("Enter patient ID");
+				pid = sc.nextInt();
+				getBedWardAssigned(conn,pid,person_id);
+				operatorMenu(conn, person_id);
+				break;
+			
 			
 		default:
 			System.out.println("Enter a valid choice: ");
 			operatorMenu(conn, person_id);
-	
 		}
 		
 		}catch(Exception ex) {
 			System.out.println("Exception" + ex);
 		}
 	}
+	private void getBedWardAssigned(Connection conn, int pid, int person_id) {
+		try {
+			String sel_query = "select * from PATIENT_IS_ASSIGNED_BED where pid = ?;" ;
+			PreparedStatement stmt = conn.prepareStatement(sel_query);
+			stmt.setInt(1, pid);
+			ResultSet rs = stmt.executeQuery();
+			
+			if(rs.next()) {
+			System.out.println(" Patient PID " + pid + " is assigned Ward " + rs.getInt("WID") + " Bed " + rs.getInt("Bed_ID"));			
+			return;
+			}
+			else {
+			System.out.println("Record not found !!");
+			return;
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("Something went wrong. Please try again!!");
+			operatorMenu(conn, person_id);
+			e.printStackTrace();
+		}
+		
+		
+	}
 	private void genMedAndBillAcc(Connection conn, int person_id, int pid) throws SQLException {
 		try {
 		
 		conn.setAutoCommit(false);	
-			
-		PreparedStatement stmt = conn.prepareStatement("INSERT INTO registrations values(?,?)");
-		stmt.setInt(1, person_id);
-		stmt.setInt(2, pid);
-		stmt.execute();
 		
-		
-		
-		PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO medical_records(PID,start_date) values(?,curdate());");
+		PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO MEDICAL_RECORDS(PID,start_date) values(?,curdate());");
 		stmt1.setInt(1, pid);
 		stmt1.execute();
 		
@@ -107,7 +137,7 @@ public class Operator {
 		
 		
 					
-		PreparedStatement stm2 = conn.prepareStatement("INSERT INTO billing_account(PID,payment_method,card_number,SSN_payer,billing_address,registration_fee,visit_date) \r\n" + 
+		PreparedStatement stm2 = conn.prepareStatement("INSERT INTO BILLING_ACCOUNT(PID,payment_method,card_number,SSN_payer,billing_address,registration_fee,visit_date) \r\n" + 
 				"values (?,?,?,?,?,100,curdate())");
 		stm2.setInt(1, pid);
 		stm2.setString(2,payment_method );
@@ -154,17 +184,17 @@ public class Operator {
 			System.out.println("Enter End Date : ");
 			String end_d = sc.next();
 			
-			releaseBed(conn,person_id,pid); // add arg end_date
+			releaseBed(conn,person_id,pid,end_d);
 			
 			generateBill(conn,person_id,pid);
 			
 			removeDocandupdateMedRec(conn,pid);
 			
-			PreparedStatement stmt = conn.prepareStatement("delete from patient_is_assigned_bed where PID = ?");
+			PreparedStatement stmt = conn.prepareStatement("delete from PATIENT_IS_ASSIGNED_BED where PID = ?");
 			stmt.setInt(1, pid);
 			stmt.execute();
 			
-			PreparedStatement stmt1 = conn.prepareStatement("update medical_records set end_date = ? where end_date is null and PID = ? ");
+			PreparedStatement stmt1 = conn.prepareStatement("update MEDICAL_RECORDS set end_date = ? where end_date is null and PID = ? ");
 			stmt1.setString(1, end_d);
 			stmt1.setInt(2, pid);
 			stmt1.execute();
@@ -186,8 +216,8 @@ public class Operator {
 	private void generateBill(Connection conn, int person_id, int pid) {
 		try {
 			
-			PreparedStatement stmt = conn.prepareStatement("select datediff(end_date,start_date) * (select charges from ward where WID = (select WID from patient_is_assigned_bed where PID = ?)) as accomodation_charges \r\n" + 
-					"from patient_is_assigned_bed where PID = ?;");
+			PreparedStatement stmt = conn.prepareStatement("select datediff(end_date,start_date) * (select charges from WARD where WID = (select WID from PATIENT_IS_ASSIGNED_BED where PID = ?)) as accomodation_charges \r\n" + 
+					"from PATIENT_IS_ASSIGNED_BED where PID = ?;");
 			stmt.setInt(1, pid);
 			stmt.setInt(2, pid);
 			ResultSet rs = stmt.executeQuery();
@@ -195,14 +225,14 @@ public class Operator {
 			rs.next();
 			int accomodation_charges = rs.getInt("accomodation_charges");
 			
-			PreparedStatement stmt1 = conn.prepareStatement("select max(Bill_ID) as Bill_ID from billing_account where PID = ?");
+			PreparedStatement stmt1 = conn.prepareStatement("select max(Bill_ID) as Bill_ID from BILLING_ACCOUNT where PID = ?");
 			stmt1.setInt(1, pid);
 			ResultSet rs1 = stmt1.executeQuery();
 			
 			rs1.next();
 			int bill_id = rs1.getInt("Bill_ID");
 			
-			PreparedStatement stmt2 = conn.prepareStatement("update billing_account set accomodation_fee= ?  where PID = ? and Bill_id = ?");
+			PreparedStatement stmt2 = conn.prepareStatement("update BILLING_ACCOUNT set accomodation_fee= ?  where PID = ? and Bill_id = ?");
 			stmt2.setInt(1, accomodation_charges);
 			stmt2.setInt(2, pid);
 			stmt2.setInt(3, bill_id);
@@ -289,18 +319,18 @@ public class Operator {
 //		}
 //	}
 	
-	private void releaseBed(Connection conn, int person_id,int pid) {
+	private void releaseBed(Connection conn, int person_id,int pid, String end_d) {
 		try {
 			if(pid == 0) {
 				System.out.println("Enter the patient ID :-> ");
 				pid=sc.nextInt();
 			}
 			
-			System.out.println("Enter End Date :-> ");
-			String end_date = sc.next();
+			
+			String end_date = end_d;
 			
 			
-			PreparedStatement stmt1 = conn.prepareStatement("select WID,Bed_ID from patient_is_assigned_bed where PID = ? AND end_date is null");
+			PreparedStatement stmt1 = conn.prepareStatement("select WID,Bed_ID from PATIENT_IS_ASSIGNED_BED where PID = ? AND end_date is null");
 			stmt1.setInt(1, pid);
 			ResultSet rs = stmt1.executeQuery();
 			rs.next();
@@ -308,7 +338,7 @@ public class Operator {
 			int bed_id = rs.getInt("Bed_ID");
 			int wid = rs.getInt("WID");
 			
-			PreparedStatement stmt = conn.prepareStatement("update patient_is_assigned_bed set end_date = ? where PID = ? AND end_date is null");
+			PreparedStatement stmt = conn.prepareStatement("update PATIENT_IS_ASSIGNED_BED set end_date = ? where PID = ? AND end_date is null");
 			stmt.setString(1, end_date);
 			stmt.setInt(2, pid);
 			stmt.execute();
@@ -327,7 +357,7 @@ public class Operator {
 		
 	}
 	
-	private boolean assignBed(Connection conn, int person_id, int pid) throws SQLException {
+	private boolean assignBed(Connection conn, int pid, int person_id) throws SQLException {
 		try {
 			if(pid == 0) {
 				System.out.println("Enter the patient ID :-> ");
@@ -339,7 +369,7 @@ public class Operator {
 			if(pref == 0)
 			return false;	
 			
-			PreparedStatement stmt = conn.prepareStatement("select WID,Bed_ID from bed where WID IN (select WID from bed group by WID having count(WID) = ?) and availability = 0;");
+			PreparedStatement stmt = conn.prepareStatement("select WID,Bed_ID from BED where WID IN (select WID from BED group by WID having count(WID) = ?) and availability = 0;");
 			stmt.setInt(1, pref);
 			ResultSet rs = stmt.executeQuery();
 			
@@ -353,7 +383,7 @@ public class Operator {
 				
 				int wid = rs.getInt("WID");
 				int bid = rs.getInt("Bed_ID");
-				PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO patient_is_assigned_bed values(?,?,?,curdate(),?)");
+				PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO PATIENT_IS_ASSIGNED_BED values(?,?,?,curdate(),?)");
 				stmt1.setInt(1, pid);
 				stmt1.setInt(2, wid);
 				stmt1.setInt(3, bid);
@@ -434,7 +464,7 @@ public class Operator {
 			}
 			
 			
-		String update_med_rec = "UPDATE medical_records SET responsible_doctor = ? WHERE PID = ? AND end_date IS NULL";
+		String update_med_rec = "UPDATE MEDICAL_RECORDS SET responsible_doctor = ? WHERE PID = ? AND end_date IS NULL";
 			stmt = conn.prepareStatement(update_med_rec);
 			stmt.setInt(1, DID);
 			stmt.setInt(2, PID);
