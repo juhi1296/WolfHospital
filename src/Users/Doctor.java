@@ -129,7 +129,7 @@ public class Doctor {
 		  System.out.println("Enter the ID of the doctor performing test :-> ");
 		  int r_did = sc.nextInt();
 		  
-		  String select_record = "SELECT RID FROM medical_records WHERE PID = ? AND END_DATE IS NULL;" ;
+		  String select_record = "SELECT RID FROM MEDICAL_RECORDS WHERE PID = ? AND END_DATE IS NULL;" ;
 		  PreparedStatement sel_stmt = conn.prepareStatement(select_record);
 		  sel_stmt.setInt(1, pid);
 		  ResultSet rs = sel_stmt.executeQuery();
@@ -375,7 +375,7 @@ public class Doctor {
 		ResultSet rs = null;
 		switch(ch) {
 		//For case 1, records for a particular PID with null end date are extracted from medical_record table
-		case 1: String select_record = "SELECT * FROM medical_records WHERE PID = ? AND END_DATE IS NULL" ;
+		case 1: String select_record = "SELECT * FROM MEDICAL_RECORDS WHERE PID = ? AND END_DATE IS NULL" ;
 			PreparedStatement sel_stmt;
 			sel_stmt = conn.prepareStatement(select_record);
 			sel_stmt.setInt(1, pid);
@@ -383,7 +383,7 @@ public class Doctor {
 			break;
 		//For case 2, all records for a particular PID are extracted from medical_record table
 		case 2:
-			String select_all_record = "SELECT * FROM medical_records WHERE PID = ?" ;
+			String select_all_record = "SELECT * FROM MEDICAL_RECORDS WHERE PID = ?" ;
 			PreparedStatement sel_all_stmt;
 			sel_all_stmt = conn.prepareStatement(select_all_record);
 			sel_all_stmt.setInt(1, pid);
@@ -443,7 +443,7 @@ public class Doctor {
 		try {
 			//To update medical record, recordID(RID) is requested from doctor
 			//Based on the RID provided, record is extracted from medical_records table
-		String sel_query = "SELECT * FROM medical_records WHERE RID = ? ";
+		String sel_query = "SELECT * FROM MEDICAL_RECORDS WHERE RID = ? ";
 		PreparedStatement sel_stmt = conn.prepareStatement(sel_query);
 			sel_stmt.setInt(1, rec_id);
 			ResultSet rs = sel_stmt.executeQuery();
@@ -488,7 +488,7 @@ public class Doctor {
 			 }
 			
 			 //Update the record, with the new value provided for the selected column, for all other columns old value will be set
-			String update_query = "UPDATE medical_records set start_date = ?,end_date = ?,prescription = ?,diagnosis_details = ?,responsible_doctor = ? WHERE RID = ? ";
+			String update_query = "UPDATE MEDICAL_RECORDS set start_date = ?,end_date = ?,prescription = ?,diagnosis_details = ?,responsible_doctor = ? WHERE RID = ? ";
 			PreparedStatement stmt = conn.prepareStatement(update_query);
 			stmt.setString(1, start_date);
 			stmt.setString(2, end_date);

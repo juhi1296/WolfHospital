@@ -218,17 +218,17 @@ public class Manager {
 			switch(choice) {
 			case 1: //View Doctor Information
 				 role = "Doctor";
-				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,DOCTOR WHERE DOCTOR.SID = staff.SID");
+				 stmt = conn.prepareStatement("SELECT STAFF.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,DOCTOR WHERE DOCTOR.SID = STAFF.SID");
 				 break;
 				 
 			case 2: //View Nurse Information
 				 role = "Nurse";
-				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,NURSE WHERE NURSE.SID = staff.SID");
+				 stmt = conn.prepareStatement("SELECT STAFF.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,NURSE WHERE NURSE.SID = STAFF.SID");
 				 break;
 				 
 			case 3: //View Operator Information
 				 role = "Operator";
-				 stmt = conn.prepareStatement("SELECT staff.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,OPERATOR WHERE OPERATOR.SID = staff.SID");
+				 stmt = conn.prepareStatement("SELECT STAFF.SID,NAME,AGE,GENDER,JOB_TITLE,PROFESSIONAL_TITLE,PHONE_NUMBER,ADDRESS,DEPARTMENT FROM STAFF,OPERATOR WHERE OPERATOR.SID = STAFF.SID");
 				 break;
 				 
 			default: //For other input
@@ -289,7 +289,7 @@ public class Manager {
 			System.out.println("Enter Patient's Gender :--> ");
 			String gender = sc.next();
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO patient (name,ssn,dob,phone_number,address,age,gender) values(?,?,?,?,?,?,?)");
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO PATIENT (name,ssn,dob,phone_number,address,age,gender) values(?,?,?,?,?,?,?)");
 			stmt.setString(1, name);
 			stmt.setString(2, ssn);
 			stmt.setString(3, dob);
@@ -306,12 +306,19 @@ public class Manager {
 			  
 			rs1.next();
 			
-			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO registrations (sid,pid) values(?,?)");
+			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO REGISTRATIONS (sid,pid) values(?,?)");
 			stmt1.setInt(1, person_id);
 			stmt1.setInt(2, rs1.getInt("PID"));
 			stmt1.executeUpdate();
 			
 			pid1 = rs1.getInt("PID");
+			
+			PreparedStatement stmt3 = conn.prepareStatement("INSERT INTO USER_LOGIN values (?,'root',?,?)");
+			stmt3.setString(1, name);
+			stmt3.setInt(2,pid1);
+			stmt3.setString(3, "P");
+			stmt3.execute();
+			
 			
 		}catch(Exception e) {
 			
@@ -357,7 +364,7 @@ public class Manager {
 			String department = sc.next();
 			
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO staff (name,age,gender,job_title,professional_title,phone_number,address,department) values(?,?,?,?,?,?,?,?)");
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO STAFF (name,age,gender,job_title,professional_title,phone_number,address,department) values(?,?,?,?,?,?,?,?)");
 			stmt.setString(1, name);
 			stmt.setInt(2, age);
 			stmt.setString(3, gender);
@@ -380,19 +387,19 @@ public class Manager {
 			switch(choice) {
 			case 1: //Add Doctor
 				 role = "Doctor";
-				 stmt1 = conn.prepareStatement("INSERT INTO doctor (SID) VALUES (?)");
+				 stmt1 = conn.prepareStatement("INSERT INTO DOCTOR (SID) VALUES (?)");
 				 r = "D";
 				 break;
 				 
 			case 2: //Add Nurse
 				 role = "Nurse";
-				 stmt1 = conn.prepareStatement("INSERT INTO nurse (SID) VALUES (?);");
+				 stmt1 = conn.prepareStatement("INSERT INTO NURSE (SID) VALUES (?);");
 				 r = "N";
 				 break;
 				 
 			case 3: //Add Operator
 				 role = "Operator";
-				 stmt1 = conn.prepareStatement("INSERT INTO operator (SID) VALUES (?);");
+				 stmt1 = conn.prepareStatement("INSERT INTO OPERATOR (SID) VALUES (?);");
 				 r = "O";
 				 break;
 				 
@@ -781,7 +788,7 @@ public class Manager {
 			System.out.println("Enter availability status :--> ");
 			int availability = sc.nextInt();
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO bed (wid,Bed_ID,availability) values(?,?,?)");
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO BED (wid,Bed_ID,availability) values(?,?,?)");
 			stmt.setInt(1, wid);
 			stmt.setInt(2, bid);
 			stmt.setInt(3, availability);
@@ -825,7 +832,7 @@ public class Manager {
 			System.out.println("Enter charges for ward :--> ");
 			int charges = sc.nextInt();
 			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO ward (sid,charges) values(?,?)");
+			PreparedStatement stmt = conn.prepareStatement("INSERT INTO WARD (sid,charges) values(?,?)");
 			stmt.setInt(1, sid);
 			stmt.setInt(2, charges);
 			stmt.executeUpdate();
