@@ -228,8 +228,8 @@ public class Doctor {
 	public static void viewPatient(Connection conn, int person_id)
 	  {
 		  try {
-			  //A doctor can view information of all the patients or of a particular patient
-			  System.out.println("1. View all patients.");
+			  //A doctor can view information of all the patients assigned to him or of a particular patient
+			  System.out.println("1. View all patients assigned to me.");
 			  System.out.println("2. View a particular patient.");
 			  System.out.println("Enter your choice :-> ");
 
@@ -238,8 +238,9 @@ public class Doctor {
 			  if(ch==1)
 			  {
 				  //If the doctor wishes to see information of all the patients, Select query is performed on Patients table without any constraint
-				  PreparedStatement stmt = conn.prepareStatement("SELECT PID,NAME,SSN,DOB,PHONE_NUMBER,ADDRESS,AGE,GENDER FROM PATIENT");
-					ResultSet rs = stmt.executeQuery();
+				  PreparedStatement stmt = conn.prepareStatement("SELECT PATIENT.* FROM PATIENT,TREATS,DOCTOR,STAFF WHERE STAFF.SID = DOCTOR.SID AND DOCTOR.SID = TREATS.SID AND TREATS.PID = PATIENT.PID AND STAFF.SID = ? ");
+					stmt.setInt(1, person_id);
+				  ResultSet rs = stmt.executeQuery();
 					while(rs.next()) {
 						System.out.println("PID : " + rs.getInt("PID"));
 						System.out.println("NAME : " + rs.getString("NAME"));
