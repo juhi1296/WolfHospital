@@ -23,9 +23,9 @@ public class Operator {
 		System.out.println("3. Assign Bed");
 		System.out.println("4 Assign Doctor to Patient");
 		System.out.println("5. Create Billing Account and Medical Record for the visit");
-		
 		System.out.println("6. Check Out Patient");
 		System.out.println("7. Get Ward and Bed assigned to a patient");
+		System.out.println("8. Update assigned doctor");
 		
 		//System.out.println("8. remove doc assigned");
 		
@@ -81,7 +81,12 @@ public class Operator {
 				getBedWardAssigned(conn,pid,person_id);		//get ward and bed id from patient id
 				operatorMenu(conn, person_id);		//displays operator menu
 				break;
-			
+		case 8: 
+				System.out.println("Enter patient ID"); //gets patients id from the user
+				pid=sc.nextInt();
+				updateResponsibleDoctor(conn,pid,person_id);
+				operatorMenu(conn,person_id);
+				break;
 			
 		default:
 			System.out.println("Enter a valid choice: ");		//if valid choice is not entered by the user
@@ -482,6 +487,40 @@ public class Operator {
 			}
 			
 		}
+	
+	private void updateResponsibleDoctor(Connection conn,int pid,int person_id)
+	{
+		try {
+			
+			
+			PreparedStatement stmt=conn.prepareStatement("Select * from TREATS WHERE PID=?");
+			stmt.setInt(1, pid);
+			
+			ResultSet rs=stmt.executeQuery();
+			
+			if(rs.next())
+			{
+				System.out.println("Enter the staff ID  of new responsible doctor. ");
+				int sid=sc.nextInt();
+				PreparedStatement stmt1=conn.prepareStatement("UPDATE TREATS SET SID=? WHERE PID=?");
+				stmt1.setInt(1, sid);
+				stmt1.setInt(2, pid);
+				
+				if(stmt1.executeUpdate()>0)
+				{
+					System.out.println("Responsible doctor updated successfully.");
+				}
+			}
+			else
+			{
+				System.out.println("No record exists with provided patientID");
+			}
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
 		
 		
 	}
