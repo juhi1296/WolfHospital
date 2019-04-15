@@ -16,55 +16,135 @@ public class Operator {
 		int pid = 0;
 		try {
 		System.out.println("----------------------------Welcome Operator----------------------------");
-		//System.out.println("1. Register New Patient");
-		//System.out.println("2. Checkout Patient");
-		//System.out.println("3. Generate Bills for Patient");
-		//System.out.println("4. Check status of Wards");
-		//System.out.println("5. Assign Bed in a Ward to patient");
-		//System.out.println("6. Release Wards and Beds");
-		//System.out.println("7. Update Medical Records for Patients");
-		//System.out.println("8. Maintain Billing account of Patient");
-		//System.out.println("9. Generate Billing account for Patient");
-		//System.out.println("10. Do not admit Patient");
-		System.out.println("11. Logout");
-		System.out.println("12. Check In Patient");
-		System.out.println("13. Check Out Patient");
-		System.out.println("14. Assign Doctor to Patient");
+		//System.out.println("1. Check In Patient");
+		System.out.println("2. Check Out Patient");
+		System.out.println("3 Assign Doctor to Patient");
+		System.out.println("4. Register new patient");
+		System.out.println("5. Get patient ID of registered patients");
+		System.out.println("6. Assign Bed");
+		System.out.println("7. Create Billing Account and Medical Record for the visit");
 		System.out.println("Enter your choice :-> ");
 		
 		int doctor_choice = sc.nextInt();
 		
 		switch(doctor_choice) {
-		case 1: 
-			pid = registerPatient(conn,person_id);
-			break;
-			
 		
-			
-		case 5:
-			assignBed(conn,person_id,pid);
-			break;
-			
-		case 6:
-			releaseBed(conn,person_id,pid);
-			break;
-			
-		case 12:
-			checkin(conn,person_id);
-			break;
+		case 4: pid = registerPatient(conn,person_id);
+				System.out.println("Patient with PID " + pid + " successfully added");
+				operatorMenu(conn, person_id);
+				break;
 		
-		case 13:
+		case 5: pid = getRegisteredPatient(conn,person_id);		
+				System.out.println("PID of patient: " + pid);
+				operatorMenu(conn, person_id);
+				break;
+				
+		case 6:	
+				System.out.println("Enter patient ID");
+				pid = sc.nextInt();
+				if(!assignBed(conn,pid,person_id))
+				{
+				System.out.println("Bed not assigned!!");
+				operatorMenu(conn, person_id);
+				}
+				operatorMenu(conn, person_id);
+				break;
+		
+		case 7: 	
+				System.out.println("Enter patient ID");
+				pid = sc.nextInt();
+				genMedAndBillAcc(conn,person_id,pid);
+				operatorMenu(conn, person_id);
+				break;
+				
+	//	case 1:
+		//	checkin(conn,person_id);
+			//break;
+		
+		case 2:
 			checkout(conn,person_id);
 			break;
 		
-		case 14:
+		case 3:
 			assignDoc(conn, person_id);
+			break;
 			
+		default:
+			System.out.println("Enter a valid choice: ");
+			operatorMenu(conn, person_id);
+	
 		}
 		
 		}catch(Exception ex) {
 			System.out.println("Exception" + ex);
 		}
+	}
+	private void genMedAndBillAcc(Connection conn, int person_id, int pid) throws SQLException {
+		try {
+		
+		conn.setAutoCommit(false);	
+			
+		PreparedStatement stmt = conn.prepareStatement("INSERT INTO registrations values(?,?)");
+		stmt.setInt(1, person_id);
+		stmt.setInt(2, pid);
+		stmt.execute();
+		
+		
+		
+		PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO medical_records(PID,start_date) values(?,curdate());");
+		stmt1.setInt(1, pid);
+		stmt1.execute();
+		
+		System.out.println("Generating Billing Account ...");
+		System.out.println("Enter Payment Method :--> ");
+		String payment_method = sc.next();
+		System.out.println("Enter Card Number :--> ");
+		String card_number = sc.next();
+		System.out.println("Enter SSN for Payer :--> ");
+		String SSN_payer = sc.next();
+		System.out.println("Enter Billing Address :--> ");
+		String billing_address = sc.next();
+		
+		
+					
+		PreparedStatement stm2 = conn.prepareStatement("INSERT INTO billing_account(PID,payment_method,card_number,SSN_payer,billing_address,registration_fee,visit_date) \r\n" + 
+				"values (?,?,?,?,?,100,curdate())");
+		stm2.setInt(1, pid);
+		stm2.setString(2,payment_method );
+		stm2.setString(3, card_number);
+		stm2.setString(4, SSN_payer);
+		stm2.setString(5, billing_address);
+		stm2.execute();
+		System.out.println("Patient " + pid + " successfully chekedin!!");
+		conn.commit();
+		conn.setAutoCommit(true);
+		operatorMenu(conn, person_id);
+	}
+	catch(Exception ex) {
+			System.out.println(ex);
+			conn.rollback();
+			conn.setAutoCommit(true);
+			operatorMenu(conn, person_id);
+	}
+		
+	}
+	private int getRegisteredPatient(Connection conn, int person_id) {
+		try {
+		System.out.println("Enter Your Name : ");
+		String name = sc.next();
+		System.out.println("Enter Your DOB (YYYY-MM-DD) : ");
+		String dob = sc.next();
+		PreparedStatement stmt = conn.prepareStatement("SELECT PID FROM PATIENT WHERE NAME = ? AND DOB = ?");
+		stmt.setString(1, name);
+		stmt.setString(2, dob);
+		ResultSet rs = stmt.executeQuery();
+		rs.next();
+		return rs.getInt("PID");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
+		
 	}
 	private void checkout(Connection conn, int person_id) throws SQLException {
 		try {
@@ -89,9 +169,10 @@ public class Operator {
 			stmt1.setInt(2, pid);
 			stmt1.execute();
 			
-			System.out.println("CHECKED OUT");
+			System.out.println("Patient " + pid + " successfully checked out!!");
 			conn.commit();
 			conn.setAutoCommit(true);
+			operatorMenu(conn, person_id);
 		}catch(Exception ex) {
 			conn.rollback();
 			conn.setAutoCommit(true);
@@ -132,80 +213,81 @@ public class Operator {
 			ex.getStackTrace();
 		}
 	}
-	private void checkin(Connection conn, int person_id) {
-		int pid = 0;
-		try {
-			conn.setAutoCommit(false);
-			System.out.println("Do you want to register new Patient ?(Y/N) :");
-			String choice = sc.next();
-			
-			if(choice.equals("Y")) {
-				pid = registerPatient(conn,person_id);
-			}else {
-				System.out.println("Enter Your Name : ");
-				String name = sc.next();
-				System.out.println("Enter Your DOB (YYYY-MM-DD) : ");
-				String dob = sc.next();
-				PreparedStatement stmt = conn.prepareStatement("SELECT PID FROM PATIENT WHERE NAME = ? AND DOB = ?");
-				stmt.setString(1, name);
-				stmt.setString(2, dob);
-				ResultSet rs = stmt.executeQuery();
-				
-				rs.next();
-				pid = rs.getInt("PID");
-				
-			}
-			
-			System.out.println("Is Bed Required ?(Y/N)");
-			choice = sc.next();
-			if(choice.equals("Y")) {
-				assignBed(conn,person_id,pid);
-			}
-			
-			PreparedStatement stmt = conn.prepareStatement("INSERT INTO registrations values(?,?)");
-			stmt.setInt(1, person_id);
-			stmt.setInt(2, pid);
-			stmt.execute();
-			
-			
-			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO medical_records(PID,start_date) values(?,curdate());");
-			stmt1.setInt(1, pid);
-			stmt1.execute();
-			
-			System.out.println("Generating Billing Account ...");
-			System.out.println("Enter Payment Method :--> ");
-			String payment_method = sc.next();
-			System.out.println("Enter Card Number :--> ");
-			String card_number = sc.next();
-			System.out.println("Enter SSN for Payer :--> ");
-			String SSN_payer = sc.next();
-			System.out.println("Enter Billing Address :--> ");
-			String billing_address = sc.next();
-			
-			
-						
-			PreparedStatement stm2 = conn.prepareStatement("INSERT INTO billing_account(PID,payment_method,card_number,SSN_payer,billing_address,registration_fee,visit_date) \r\n" + 
-					"values (?,?,?,?,?,100,curdate())");
-			stm2.setInt(1, pid);
-			stm2.setString(2,payment_method );
-			stm2.setString(3, card_number);
-			stm2.setString(4, SSN_payer);
-			stm2.setString(5, billing_address);
-			stm2.execute();
-			System.out.println("CHECKED IN");
-			conn.commit();
-			
-		}
-		catch(Exception ex) {
-			try {
-				conn.rollback();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		}
-	}
+//	private void checkin(Connection conn, int person_id) throws SQLException {
+//		int pid = 0;
+//		try {
+//			conn.setAutoCommit(false);
+//			System.out.println("Do you want to register new Patient ?(Y/N) :");
+//			String choice = sc.next();
+//			
+//			if(choice.equals("Y") || choice.equals("y")) {
+//				pid = registerPatient(conn,person_id);
+//			}else {
+//				System.out.println("Enter Your Name : ");
+//				String name = sc.next();
+//				System.out.println("Enter Your DOB (YYYY-MM-DD) : ");
+//				String dob = sc.next();
+//				PreparedStatement stmt = conn.prepareStatement("SELECT PID FROM PATIENT WHERE NAME = ? AND DOB = ?");
+//				stmt.setString(1, name);
+//				stmt.setString(2, dob);
+//				ResultSet rs = stmt.executeQuery();
+//				
+//				rs.next();
+//				pid = rs.getInt("PID");
+//				
+//			}
+//			
+//			System.out.println("Is Bed Required ?(Y/N)");
+//			choice = sc.next();
+//			if(choice.equals("Y") || choice.equals("y")) {
+//				if(!assignBed(conn,person_id,pid))
+//				{
+//					System.out.println("Bed not assigned!!");
+//					operatorMenu(conn, person_id);
+//				}
+//			}
+//			
+//			PreparedStatement stmt = conn.prepareStatement("INSERT INTO registrations values(?,?)");
+//			stmt.setInt(1, person_id);
+//			stmt.setInt(2, pid);
+//			stmt.execute();
+//			
+//			
+//			
+//			PreparedStatement stmt1 = conn.prepareStatement("INSERT INTO medical_records(PID,start_date) values(?,curdate());");
+//			stmt1.setInt(1, pid);
+//			stmt1.execute();
+//			
+//			System.out.println("Generating Billing Account ...");
+//			System.out.println("Enter Payment Method :--> ");
+//			String payment_method = sc.next();
+//			System.out.println("Enter Card Number :--> ");
+//			String card_number = sc.next();
+//			System.out.println("Enter SSN for Payer :--> ");
+//			String SSN_payer = sc.next();
+//			System.out.println("Enter Billing Address :--> ");
+//			String billing_address = sc.next();
+//			
+//			
+//						
+//			PreparedStatement stm2 = conn.prepareStatement("INSERT INTO billing_account(PID,payment_method,card_number,SSN_payer,billing_address,registration_fee,visit_date) \r\n" + 
+//					"values (?,?,?,?,?,100,curdate())");
+//			stm2.setInt(1, pid);
+//			stm2.setString(2,payment_method );
+//			stm2.setString(3, card_number);
+//			stm2.setString(4, SSN_payer);
+//			stm2.setString(5, billing_address);
+//			stm2.execute();
+//			System.out.println("Patient " + pid + "successfully chekedin!!");
+//			conn.commit();
+//			conn.setAutoCommit(true);
+//			operatorMenu(conn, person_id);
+//		}
+//		catch(Exception ex) {
+//				conn.rollback();
+//				conn.setAutoCommit(true);
+//		}
+//	}
 	
 	private void releaseBed(Connection conn, int person_id,int pid) {
 		try {
@@ -245,15 +327,17 @@ public class Operator {
 		
 	}
 	
-	private void assignBed(Connection conn, int person_id, int pid) {
+	private boolean assignBed(Connection conn, int person_id, int pid) throws SQLException {
 		try {
 			if(pid == 0) {
 				System.out.println("Enter the patient ID :-> ");
 				pid=sc.nextInt();
 			}
 			
-			System.out.println("Enter Preference of Patient(1 bed, 2 beds and 4 beds) :-> ");
+			System.out.println("Enter Preference of Patient(1 bed, 2 beds and 4 beds). Press 0 to exit :-> ");
 			int pref = sc.nextInt();
+			if(pref == 0)
+			return false;	
 			
 			PreparedStatement stmt = conn.prepareStatement("select WID,Bed_ID from bed where WID IN (select WID from bed group by WID having count(WID) = ?) and availability = 0;");
 			stmt.setInt(1, pref);
@@ -261,6 +345,8 @@ public class Operator {
 			
 			if(!rs.next()) {
 				System.out.println("Preferred choice is not available");
+				return false;
+				
 			}
 			else {
 				conn.setAutoCommit(false);
@@ -280,19 +366,17 @@ public class Operator {
 				stmt2.execute();
 				
 				conn.commit();
-				
-				System.out.println("Patient is assigned a Bed "+ bid + "in ward " + wid + "\n");
-				
+				conn.setAutoCommit(true);
+				System.out.println("Patient is assigned a Bed "+ bid + " in ward " + wid + "\n");
+				return true;
 			}	
 			
 		}catch(Exception ex) {
-			try {
+			
 				conn.rollback();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			System.out.println("Exception" + ex);
+				conn.setAutoCommit(true);
+				System.out.println("Exception" + ex);
+				return false;
 		}
 		
 	}
