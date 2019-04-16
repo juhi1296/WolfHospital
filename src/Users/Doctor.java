@@ -418,7 +418,7 @@ public class Doctor {
 				System.out.println("Please enter date in yyyy-mm-dd format.");
 				getMedicalRecord(conn, person_id);
 			}
-			String select_record_inRange="SELECT * FROM MEDICAL_RECORDS WHERE PID=? AND START_DATE>=? AND END_DATE<=?";
+			String select_record_inRange="SELECT * FROM MEDICAL_RECORDS WHERE PID=? AND START_DATE>=? AND START_DATE<=?";
 			PreparedStatement stmt=conn.prepareStatement(select_record_inRange);
 			stmt.setInt(1, pid);
 			stmt.setDate(2, new java.sql.Date(start.getTime()));
@@ -446,6 +446,7 @@ public class Doctor {
 			System.out.println("Diagnosis Details:" + rs.getString("diagnosis_details"));
 			System.out.println("Responsible Doctor:" + rs.getInt("responsible_doctor"));
 			System.out.println("\n");
+			System.out.println("*******************************************************");
 		  }
 		  while(rs.next());
 		 }
@@ -474,27 +475,36 @@ public class Doctor {
 	
 	
   private static void updateMedicalRecord(Connection conn, int person_id) {
-		System.out.println("Enter Record ID :=> ");
-		int rec_id = sc.nextInt();
+		System.out.println("Enter Patient ID :=> ");
+		int pid = sc.nextInt();
 		
 		try {
 			//To update medical record, recordID(RID) is requested from doctor
 			//Based on the RID provided, record is extracted from medical_records table
+		String select_record = "SELECT * FROM MEDICAL_RECORDS WHERE PID = ? AND END_DATE IS NULL" ;
+		PreparedStatement stmt1=conn.prepareStatement(select_record);
+		stmt1.setInt(1, pid);
+		ResultSet rs1=stmt1.executeQuery();
+		int rid=0;
+		if(rs1.next())
+		{
+			rid=rs1.getInt("RID");
+		}
 		String sel_query = "SELECT * FROM MEDICAL_RECORDS WHERE RID = ? ";
 		PreparedStatement sel_stmt = conn.prepareStatement(sel_query);
-			sel_stmt.setInt(1, rec_id);
-			ResultSet rs = sel_stmt.executeQuery();
+			sel_stmt.setInt(1,rid );
+			ResultSet rs2 = sel_stmt.executeQuery();
 			
-			if(rs.next())
+			if(rs2.next())
 			{
 				//if a record exists with provided ID, all the information is displayed
-			 String start_date = rs.getString("start_date");
-			 String end_date = rs.getString("end_date");
-			 String prescription = rs.getString("prescription");
-			 String diagnosis_details = rs.getString("diagnosis_details");
-			 int responsible_doctor = rs.getInt("responsible_doctor");
+			 String start_date = rs2.getString("start_date");
+			 String end_date = rs2.getString("end_date");
+			 String prescription = rs2.getString("prescription");
+			 String diagnosis_details = rs2.getString("diagnosis_details");
+			 int responsible_doctor = rs2.getInt("responsible_doctor");
 			
-			 System.out.println("Record ID:" + rs.getInt("RID"));
+			 System.out.println("Record ID:" + rs2.getInt("RID"));
 			 System.out.println("1. Start Date:" + start_date);
 			 System.out.println("2. End Date:" + end_date);
 		     System.out.println("3. Prescription:" + prescription);
@@ -532,7 +542,7 @@ public class Doctor {
 			stmt.setString(3, prescription);
 			stmt.setString(4, diagnosis_details);
 			stmt.setInt(5, responsible_doctor);
-			stmt.setInt(6, rec_id);
+			stmt.setInt(6, rid);
 			
 			stmt.executeUpdate();
 			System.out.println("Successfully updated the record!!");

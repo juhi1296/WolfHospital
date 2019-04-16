@@ -26,7 +26,7 @@ public class Operator {
 		System.out.println("6. Check Out Patient");
 		System.out.println("7. Get Ward and Bed assigned to a patient");
 		System.out.println("8. Update assigned doctor");
-		
+		System.out.println("9. List all available ward and beds");
 		//System.out.println("8. remove doc assigned");
 		
 		System.out.println("Enter your choice :-> ");
@@ -58,6 +58,7 @@ public class Operator {
 		
 		case 4:
 				assignDoc(conn, person_id);		//assigns doctor to a patient
+				operatorMenu(conn, person_id);
 				break;
 			
 		case 5: 	
@@ -73,6 +74,7 @@ public class Operator {
 		
 		case 6:
 			checkout(conn,person_id);		//checks out patient
+			operatorMenu(conn, person_id);
 			break;
 		
 		case 7: 
@@ -85,6 +87,11 @@ public class Operator {
 				System.out.println("Enter patient ID"); //gets patients id from the user
 				pid=sc.nextInt();
 				updateResponsibleDoctor(conn,pid,person_id);
+				operatorMenu(conn,person_id);
+				break;
+				
+		case 9: 
+				listAvailBed(conn,person_id);
 				operatorMenu(conn,person_id);
 				break;
 			
@@ -522,5 +529,24 @@ public class Operator {
 		}
 	}
 		
-		
+	private void listAvailBed(Connection conn,int person_id)
+	{
+		try {
+			PreparedStatement stmt=conn.prepareStatement("select WID,Bed_ID from BED where availability = 0");
+			ResultSet rs=stmt.executeQuery();
+			
+			while(rs.next())
+			{
+				System.out.println("WID:"+rs.getInt("WID"));
+				System.out.println("BID:"+rs.getInt("Bed_ID"));
+				System.out.println("*************************");
+
+			}
+			
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
 	}

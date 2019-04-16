@@ -357,9 +357,11 @@ public class Manager {
 			System.out.println("Enter Staff's Gender :--> ");
 			String gender = sc.next();
 			System.out.println("Enter Staff's Job Title :--> ");
-			String job_title = sc.next();
+			sc.nextLine();
+			String job_title = sc.nextLine();
 			System.out.println("Enter Staff's Professional Title :--> ");
 			String professional_title = sc.next();
+			professional_title+=sc.nextLine();
 			System.out.println("Enter Staff's Phone Number :--> ");
 			String phone_number = sc.next();
 			System.out.println("Enter Staff's Address :--> ");
