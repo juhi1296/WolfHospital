@@ -144,9 +144,9 @@ public class Operator {
 		String card_number = sc.next();					//takes card number from the user
 		System.out.println("Enter SSN for Payer :--> ");
 		String SSN_payer = sc.next();					//takes SSN of payer from the user
-		System.out.println("Enter Billing Address :--> ");
-		String billing_address = sc.next();				//takes billing address from the user
-		
+		System.out.println("Enter Billing Address :--> ");			
+		String billing_address = sc.next(); //takes billing address from the user
+		billing_address+=sc.nextLine();
 		
 					
 		PreparedStatement stm2 = conn.prepareStatement("INSERT INTO BILLING_ACCOUNT(PID,payment_method,card_number,SSN_payer,billing_address,registration_fee,visit_date) \r\n" + 
