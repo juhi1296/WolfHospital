@@ -30,7 +30,8 @@ public class Manager {
 			System.out.println("13. Add New Bed to ward");
 			System.out.println("14. Delete Bed Information");
 			System.out.println("15. Doctor responsible for patients");
-			System.out.println("16. Logout");
+			System.out.println("16. View all patients undergoing treatment");
+			System.out.println("17. Logout");
 			System.out.println("Enter your choice :-> ");
 			
 			int manager_choice = sc.nextInt();
@@ -96,7 +97,11 @@ public class Manager {
 				responsibleDoctor(conn,person_id);
 				break;
 				
-			case 16: //Logout
+			case 16://View list of patients undergoing treatment in the hospital
+				viewPatientGettingTreatment(conn,person_id);
+				break;
+				
+			case 17: //Logout
 				System.out.println("Loggin out..");
 				TimeUnit.SECONDS.sleep(3);
 				System.exit(0);
@@ -562,6 +567,7 @@ public class Manager {
 		}
 	}
 	
+	@SuppressWarnings("resource")
 	public static void editStaff(Connection conn, int person_id) {
 		try {
 			System.out.println("----------------------Edit Staff's profile--------------------");
@@ -964,6 +970,39 @@ public class Manager {
 			managerMenu(conn,person_id);
 		}
 	}
+	
+	public static void viewPatientGettingTreatment(Connection conn, int person_id)
+	{
+		try {
+			PreparedStatement stmt=conn.prepareStatement("SELECT T.PID,P.NAME AS PATIENT_NAME,T.SID,S.NAME AS DOCTOR_NAME FROM TREATS T,PATIENT P,STAFF S WHERE T.PID=P.PID AND T.SID=S.SID");
+			ResultSet rs = stmt.executeQuery();
+		
+			while(rs.next()) {
+				System.out.println("PatientID : " + rs.getInt("PID"));
+				System.out.println("Patient Name : " + rs.getString("PATIENT_NAME"));
+				System.out.println("Responsible DoctorID : " + rs.getInt("SID"));
+				System.out.println("Responsible Doctor Name : " + rs.getString("DOCTOR_NAME"));
+				System.out.println("**************************************************");
+				System.out.println("\n");
+			}
+			
+			System.out.println("Press 0 to go back");
+			int choice = sc.nextInt();
+			if (choice == 0) {
+				managerMenu(conn, person_id);
+			}
+			else
+			{
+				validChoice(0);
+				managerMenu(conn, person_id);
+			}			
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+	}
+	
 	
 	public static void validChoice(int choice)
 	{
