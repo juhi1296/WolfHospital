@@ -1,9 +1,14 @@
 package Users;
 
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -25,6 +30,7 @@ public class Doctor {
 		System.out.println("6. Access Medical Records of a patient"); //Doctor can view medical records of a patient
 		System.out.println("7. Update Medical Records of a patient"); //Doctor can update medical record of a patient
 		System.out.println("8. Logout"); //logs out of the system
+		
 		System.out.println("Enter your choice :-> ");
 		
 		int doctor_choice = sc.nextInt();
@@ -370,6 +376,7 @@ public class Doctor {
 		//Doctor can see active medical records or all medical records of a particular patient
 		System.out.println("1. Get active medical record");
 		System.out.println("2. Get previous all medical records");
+		System.out.println("3. Get Medical Record for a certain time period");
 		System.out.println("Enter your choice =>");
 		int ch = sc.nextInt();
 		try {
@@ -391,6 +398,35 @@ public class Doctor {
 			rs = sel_all_stmt.executeQuery();
 			break;
 		
+		case 3:
+			Date start=null;
+			Date end=null;
+			try {
+				String expectedPattern = "yyyy-MM-dd";
+				SimpleDateFormat formatter = new SimpleDateFormat(expectedPattern);
+				formatter.setLenient(false);
+				System.out.println("Enter start date in yyyy-mm-dd format");
+				String s=sc.next();
+				System.out.println("Enter end date in yyyy-mm-dd format");
+				String e=sc.next();
+				start = formatter.parse(s);
+				end=formatter.parse(e);
+			}
+			catch(ParseException e)
+			{
+				//If the patient enters the date in incorrect format, he is shown an error message.
+				System.out.println("Please enter date in yyyy-mm-dd format.");
+				getMedicalRecord(conn, person_id);
+			}
+			String select_record_inRange="SELECT * FROM MEDICAL_RECORDS WHERE PID=? AND START_DATE>=? AND END_DATE<=?";
+			PreparedStatement stmt=conn.prepareStatement(select_record_inRange);
+			stmt.setInt(1, pid);
+			stmt.setDate(2, new java.sql.Date(start.getTime()));
+			stmt.setDate(3, new java.sql.Date(end.getTime()));
+			rs=stmt.executeQuery();
+			break;
+			
+			
 		default: System.out.println("Invalid Choice!!!");
 				 getMedicalRecord(conn,person_id);
 				 break;
